@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentEasy — Design Direction Exploration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #F8F4EE;
+      --surface:  #FFFFFF;
+      --primary:  #4A6172;
+      --accent:   #C8952A;
+      --oak:      #C4955A;
+      --text:     #1E1E1E;
+      --muted:    #6B7280;
+      --success:  #3D7A5F;
+      --pending:  #B87A1A;
+      --error:    #C0392B;
+      --stone:    #3A3D42;
+      --ff-disp:  'Playfair Display', serif;
+      --ff-ui:    'Inter', sans-serif;
+    }
+
+    body {
+      font-family: var(--ff-ui);
+      background: #DDD9D1;
+      color: var(--text);
+      padding: 48px 32px 64px;
+      min-height: 100vh;
+    }
+
+    /* ── Page header ── */
+    .page-header { max-width: 1440px; margin: 0 auto 16px; }
+    .page-header h1 {
+      font-family: var(--ff-disp);
+      font-size: 34px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .page-header p { font-size: 14px; color: var(--muted); }
+
+    /* ── Token strip ── */
+    .token-strip {
+      max-width: 1440px; margin: 0 auto 40px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .token {
+      display: flex; align-items: center; gap: 7px;
+      background: white; border-radius: 8px; padding: 7px 12px;
+      font-size: 12px; color: var(--text);
+    }
+    .token-swatch {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .token-hex { color: var(--muted); font-size: 11px; }
+
+    /* ── Legend ── */
+    .legend {
+      max-width: 1440px; margin: 0 auto 48px;
+      display: grid; grid-template-columns: repeat(6,1fr); gap: 10px;
+    }
+    .legend-card {
+      background: white; border-radius: 10px; padding: 14px 16px;
+      cursor: pointer; transition: box-shadow .15s;
+    }
+    .legend-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+    .legend-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .legend-title { font-size: 14px; font-weight: 700; margin-top: 3px; }
+    .legend-desc { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.45; }
+
+    /* ── Grid ── */
+    .grid {
+      max-width: 1440px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 56px 40px;
+    }
+
+    .direction { display: flex; flex-direction: column; gap: 14px; }
+    .dir-meta {}
+    .dir-num  { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .dir-name { font-size: 18px; font-weight: 700; margin-top: 2px; }
+    .dir-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 320 / 640;
+      border-radius: 36px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.1);
+      border: 7px solid #1A1A1A;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .phone-inner {
+      width: 100%; height: 100%;
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: none;
+    }
+    .phone-inner::-webkit-scrollbar { display: none; }
+
+
+    /* ════════════════════════════════════════
+       DIRECTION 1 — Warm Minimal
+    ════════════════════════════════════════ */
+    .d1 { background: var(--bg); font-family: var(--ff-ui); min-height: 100%; }
+
+    .d1-hd { padding: 22px 20px 14px; }
+    .d1-back { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .d1-title { font-size: 22px; font-weight: 700; }
+    .d1-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    .d1-body { padding: 0 20px; }
+    .d1-slabel {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted); padding: 14px 0 8px;
+    }
+    .d1-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .d1-name { font-size: 14px; font-weight: 500; }
+    .d1-right { display: flex; align-items: center; gap: 9px; }
+    .d1-amt  { font-size: 14px; font-weight: 600; }
+    .d1-pdf  {
+      background: rgba(74,97,114,.1); border-radius: 5px;
+      padding: 3px 7px; font-size: 10px; font-weight: 700; color: var(--primary);
+    }
+    .d1-total {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 13px 0; border-top: 2px solid var(--primary); margin-top: 2px;
+    }
+    .d1-tl { font-size: 13px; font-weight: 600; }
+    .d1-ta { font-size: 19px; font-weight: 700; color: var(--primary); }
+
+    .d1-tabs { display: flex; background: white; border-radius: 10px 10px 0 0; margin-top: 10px; overflow: hidden; }
+    .d1-tab {
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      border-bottom: 2px solid transparent;
+    }
+    .d1-tab.on { color: var(--primary); border-color: var(--primary); }
+    .d1-tc {
+      background: white; border-radius: 0 0 10px 10px;
+      padding: 14px 16px 16px; margin-bottom: 4px;
+    }
+    .d1-il { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 5px; }
+    .d1-iv { font-size: 13px; font-weight: 500; letter-spacing: .04em; }
+    .d1-copy {
+      margin-top: 9px; width: 100%; padding: 9px;
+      border: 1px solid rgba(74,97,114,.3); border-radius: 8px;
+      background: transparent; color: var(--primary);
+      font-size: 12px; font-weight: 600; font-family: var(--ff-ui);
+      text-align: center;
+    }
+    .d1-cta {
+      margin: 14px 20px 24px;
+      background: var(--accent); color: white;
+      border-radius: 12px; padding: 16px;
+      text-align: center; font-size: 15px; font-weight: 700;
+    }
+
+    /* ════════════════════════════════════════
+       DIRECTION 2 — Structured Cards
+    ════════════════════════════════════════ */
+    .d2 { background: var(--bg); font-family: var(--ff-ui); min-height: 100%; }
+
+    .d2-hd { background: var(--primary); padding: 22px 20px 26px; color: white; }
+    .d2-back { font-size: 11px; opacity: .65; margin-bottom: 9px; }
+    .d2-title { font-size: 20px; font-weight: 700; }
+    .d2-sub { font-size: 12px; opacity: .75; margin-top: 3px; }
+
+    .d2-body { padding: 14px 16px; }
+    .d2-card {
+      background: white; border-radius: 12px; padding: 13px 15px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 7px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .d2-cl {}
+    .d2-cn { font-size: 14px; font-weight: 600; }
+    .d2-cs { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .d2-cr { display: flex; align-items: center; gap: 10px; }
+    .d2-ca { font-size: 16px; font-weight: 700; }
+    .d2-cp { background: rgba(74,97,114,.1); border-radius: 6px; padding: 5px 9px; font-size: 10px; font-weight: 700; color: var(--primary); }
+
+    .d2-total {
+      background: var(--primary); border-radius: 12px; padding: 13px 15px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+    }
+    .d2-tl { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); }
+    .d2-ta { font-size: 20px; font-weight: 700; color: white; }
+
+    .d2-pcard { background: white; border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .d2-pl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+    .d2-pm {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    .d2-pm:last-of-type { border: none; }
+    .d2-pn { font-size: 13px; font-weight: 500; }
+    .d2-pc { background: rgba(200,149,42,.1); border-radius: 6px; padding: 4px 9px; font-size: 11px; font-weight: 600; color: var(--accent); }
+
+    .d2-cta { background: var(--accent); border-radius: 12px; padding: 16px; text-align: center; color: white; font-size: 15px; font-weight: 700; }
+
+    /* ════════════════════════════════════════
+       DIRECTION 3 — Bold Action
+    ════════════════════════════════════════ */
+    .d3 { background: #EEE9E0; font-family: var(--ff-ui); min-height: 100%; }
+
+    .d3-hd { background: var(--stone); padding: 22px 20px 28px; position: relative; }
+    .d3-back { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+    .d3-mo { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); margin-bottom: 4px; }
+    .d3-title { font-size: 22px; font-weight: 700; color: white; line-height: 1.2; }
+    .d3-badge {
+      position: absolute; right: 18px; top: 18px;
+      background: var(--accent); color: white;
+      border-radius: 12px; padding: 9px 14px; text-align: right;
+    }
+    .d3-bl { font-size: 10px; font-weight: 600; opacity: .8; }
+    .d3-ba { font-size: 19px; font-weight: 700; }
+
+    .d3-body { padding: 0 20px; }
+    .d3-sl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 14px 0 8px; }
+    .d3-item {
+      background: white; border-radius: 10px; padding: 12px 14px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    }
+    .d3-in { font-size: 14px; font-weight: 500; }
+    .d3-ir { display: flex; align-items: center; gap: 9px; }
+    .d3-ia { font-size: 14px; font-weight: 700; }
+    .d3-ip { font-size: 10px; font-weight: 700; color: var(--primary); background: rgba(74,97,114,.1); padding: 3px 7px; border-radius: 5px; }
+
+    .d3-pcard { background: white; border-radius: 12px; margin: 10px 0; padding: 14px; }
+    .d3-pt { font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+    .d3-pr {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    .d3-pr:last-child { border: none; }
+    .d3-pn { font-size: 13px; }
+    .d3-pc { font-size: 11px; font-weight: 600; color: var(--primary); }
+
+    .d3-cta {
+      background: var(--stone); color: white; border-radius: 12px;
+      padding: 16px 18px; margin: 10px 0 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .d3-ct { font-size: 15px; font-weight: 700; }
+    .d3-ca { font-size: 18px; }
+
+    /* ════════════════════════════════════════
+       DIRECTION 4 — Soft & Warm
+    ════════════════════════════════════════ */
+    .d4 { background: #FBF8F3; font-family: var(--ff-ui); min-height: 100%; }
+
+    .d4-hd { padding: 22px 20px 14px; }
+    .d4-back { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .d4-title { font-size: 22px; font-weight: 700; }
+    .d4-pill {
+      display: inline-block; margin-top: 8px;
+      background: rgba(184,122,26,.12); color: var(--pending);
+      border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+    }
+
+    .d4-body { padding: 0 16px; }
+    .d4-hero {
+      background: linear-gradient(140deg, var(--primary) 0%, #3A5165 100%);
+      border-radius: 16px; padding: 20px; margin-bottom: 16px; color: white;
+    }
+    .d4-hl { font-size: 12px; opacity: .75; margin-bottom: 4px; }
+    .d4-hv { font-size: 32px; font-weight: 700; }
+    .d4-he { font-size: 18px; font-weight: 400; opacity: .75; }
+
+    .d4-bt { font-size: 13px; font-weight: 600; margin-bottom: 9px; }
+    .d4-bill {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 13px; background: white; border-radius: 10px; margin-bottom: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+    .d4-bl2 { display: flex; align-items: center; gap: 9px; }
+    .d4-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--oak); flex-shrink: 0; }
+    .d4-bn { font-size: 14px; font-weight: 500; }
+    .d4-br { display: flex; align-items: center; gap: 8px; }
+    .d4-ba { font-size: 14px; font-weight: 600; }
+    .d4-bp { font-size: 10px; color: var(--primary); font-weight: 700; background: rgba(74,97,114,.1); padding: 3px 6px; border-radius: 4px; }
+
+    .d4-pt { font-size: 13px; font-weight: 600; margin: 14px 0 9px; }
+    .d4-chips { display: flex; gap: 7px; margin-bottom: 14px; }
+    .d4-chip {
+      flex: 1; background: white; border-radius: 10px; padding: 10px 8px; text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 2px solid transparent;
+    }
+    .d4-chip.on { border-color: var(--primary); }
+    .d4-cn2 { font-size: 11px; font-weight: 600; }
+    .d4-cs2 { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    .d4-cta { background: var(--accent); color: white; border-radius: 14px; padding: 16px; text-align: center; font-size: 15px; font-weight: 700; margin-bottom: 24px; }
+
+    /* ════════════════════════════════════════
+       DIRECTION 5 — Compact Efficient
+    ════════════════════════════════════════ */
+    .d5 { background: var(--bg); font-family: var(--ff-ui); min-height: 100%; }
+
+    .d5-nav {
+      background: white; padding: 13px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(0,0,0,.07);
+    }
+    .d5-nb { font-size: 13px; color: var(--primary); font-weight: 500; }
+    .d5-nt { font-size: 15px; font-weight: 700; }
+    .d5-nr { font-size: 13px; color: var(--muted); }
+
+    .d5-body { padding: 12px 16px; }
+    .d5-period { display: flex; justify-content: space-between; align-items: center; margin-bottom: 11px; }
+    .d5-pl { font-size: 16px; font-weight: 700; }
+    .d5-ps { font-size: 11px; font-weight: 600; background: rgba(184,122,26,.1); color: var(--pending); padding: 4px 10px; border-radius: 20px; }
+
+    .d5-list { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 9px; border: 1px solid rgba(0,0,0,.07); }
+    .d5-row { display: flex; align-items: center; padding: 11px 14px; border-bottom: 1px solid rgba(0,0,0,.05); }
+    .d5-row:last-child { border: none; }
+    .d5-rn { font-size: 14px; flex: 1; }
+    .d5-ra { font-size: 14px; font-weight: 600; margin-right: 10px; }
+    .d5-ri { width: 24px; height: 24px; border-radius: 5px; background: rgba(74,97,114,.1); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--primary); }
+
+    .d5-total { display: flex; justify-content: space-between; align-items: center; background: var(--primary); padding: 12px 14px; border-radius: 10px; margin-bottom: 9px; }
+    .d5-tl { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); }
+    .d5-ta { font-size: 19px; font-weight: 700; color: white; }
+
+    .d5-pblock { background: white; border-radius: 12px; border: 1px solid rgba(0,0,0,.07); margin-bottom: 9px; overflow: hidden; }
+    .d5-phd { padding: 9px 14px; background: rgba(74,97,114,.05); border-bottom: 1px solid rgba(0,0,0,.06); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .d5-pr { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid rgba(0,0,0,.04); }
+    .d5-pr:last-child { border: none; }
+    .d5-pn { font-size: 13px; font-weight: 500; }
+    .d5-pc { font-size: 11px; font-weight: 600; color: var(--accent); background: rgba(200,149,42,.1); border-radius: 5px; padding: 4px 9px; }
+
+    .d5-cta { background: var(--accent); color: white; border-radius: 12px; padding: 15px; text-align: center; font-size: 15px; font-weight: 700; }
+
+    /* ════════════════════════════════════════
+       DIRECTION 6 — Split Zones
+    ════════════════════════════════════════ */
+    .d6 { background: var(--primary); font-family: var(--ff-ui); min-height: 100%; display: flex; flex-direction: column; }
+
+    .d6-top { padding: 22px 20px 20px; color: white; flex-shrink: 0; }
+    .d6-back { font-size: 11px; opacity: .55; margin-bottom: 10px; }
+    .d6-mo { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; opacity: .65; margin-bottom: 4px; }
+    .d6-amt { font-size: 36px; font-weight: 700; line-height: 1; }
+    .d6-eur { font-size: 20px; font-weight: 400; opacity: .65; }
+    .d6-sub { font-size: 13px; opacity: .65; margin-top: 5px; }
+
+    .d6-chips { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 2px; scrollbar-width: none; }
+    .d6-chips::-webkit-scrollbar { display: none; }
+    .d6-chip { flex-shrink: 0; background: rgba(255,255,255,.15); border-radius: 10px; padding: 10px 14px; min-width: 86px; }
+    .d6-cn { font-size: 11px; opacity: .75; margin-bottom: 3px; }
+    .d6-ca { font-size: 15px; font-weight: 700; }
+    .d6-cp { font-size: 10px; opacity: .55; margin-top: 3px; }
+
+    .d6-bottom { background: var(--bg); border-radius: 22px 22px 0 0; flex: 1; padding: 22px 18px; }
+    .d6-bt { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+
+    .d6-opt {
+      background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .d6-ol { display: flex; align-items: center; gap: 10px; }
+    .d6-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(74,97,114,.1); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+    .d6-on { font-size: 14px; font-weight: 600; }
+    .d6-os { font-size: 11px; color: var(--muted); }
+    .d6-oc { font-size: 11px; font-weight: 600; color: var(--accent); background: rgba(200,149,42,.1); border-radius: 6px; padding: 5px 10px; }
+
+    .d6-cta { background: var(--accent); color: white; border-radius: 12px; padding: 16px; text-align: center; font-size: 15px; font-weight: 700; margin-top: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1>RentEasy — Design Direction Exploration</h1>
+    <p>Billing screen · 6 directions · Apartment palette applied · Open in browser, scroll to compare</p>
+  </div>
+
+  <!-- Colour token reference -->
+  <div class="token-strip">
+    <div class="token"><div class="token-swatch" style="background:#F8F4EE;"></div>bg <span class="token-hex">#F8F4EE</span></div>
+    <div class="token"><div class="token-swatch" style="background:#4A6172;"></div>primary <span class="token-hex">#4A6172</span></div>
+    <div class="token"><div class="token-swatch" style="background:#C8952A;"></div>accent <span class="token-hex">#C8952A</span></div>
+    <div class="token"><div class="token-swatch" style="background:#C4955A;"></div>oak <span class="token-hex">#C4955A</span></div>
+    <div class="token"><div class="token-swatch" style="background:#3A3D42;"></div>stone <span class="token-hex">#3A3D42</span></div>
+    <div class="token"><div class="token-swatch" style="background:#3D7A5F;"></div>success <span class="token-hex">#3D7A5F</span></div>
+    <div class="token"><div class="token-swatch" style="background:#B87A1A;"></div>pending <span class="token-hex">#B87A1A</span></div>
+    <div class="token"><div class="token-swatch" style="background:#1E1E1E;"></div>text <span class="token-hex">#1E1E1E</span></div>
+  </div>
+
+  <!-- Direction legend -->
+  <div class="legend">
+    <div class="legend-card">
+      <div class="legend-num">Direction 1</div>
+      <div class="legend-title">Warm Minimal</div>
+      <div class="legend-desc">Typography leads. Generous whitespace. Closest to the bunsa.studio aesthetic.</div>
+    </div>
+    <div class="legend-card">
+      <div class="legend-num">Direction 2</div>
+      <div class="legend-title">Structured Cards</div>
+      <div class="legend-desc">Each item in its own card. Primary-colour header. Clean financial product register.</div>
+    </div>
+    <div class="legend-card">
+      <div class="legend-num">Direction 3</div>
+      <div class="legend-title">Bold Action</div>
+      <div class="legend-desc">Dark charcoal header. Floating mustard total badge. High contrast — decisive.</div>
+    </div>
+    <div class="legend-card">
+      <div class="legend-num">Direction 4</div>
+      <div class="legend-title">Soft & Warm</div>
+      <div class="legend-desc">Gradient amount hero. Payment method chips. Rounded and approachable.</div>
+    </div>
+    <div class="legend-card">
+      <div class="legend-num">Direction 5</div>
+      <div class="legend-title">Compact Efficient</div>
+      <div class="legend-desc">Standard nav bar. Dense list. Maximum info per screen. Pro tool feel.</div>
+    </div>
+    <div class="legend-card">
+      <div class="legend-num">Direction 6</div>
+      <div class="legend-title">Split Zones</div>
+      <div class="legend-desc">Blue-grey top for bill chips. Cream bottom for payment action. Two clear zones.</div>
+    </div>
+  </div>
+
+  <!-- Mockup grid -->
+  <div class="grid">
+
+    <!-- ── D1 Warm Minimal ── -->
+    <div class="direction">
+      <div class="dir-meta">
+        <div class="dir-num">Direction 1</div>
+        <div class="dir-name">Warm Minimal</div>
+        <div class="dir-desc">Typography-forward, lots of air. The tab switcher keeps payment methods tidy without a separate screen. Feels handcrafted, closest to the bunsa.studio register.</div>
+      </div>
+      <div class="phone">
+        <div class="phone-inner d1">
+          <div class="d1-hd">
+            <div class="d1-back">← Billing</div>
+            <div class="d1-title">April 2026</div>
+            <div class="d1-sub">Due by 5 April · Unpaid</div>
+          </div>
+          <div class="d1-body">
+            <div class="d1-slabel">Charges</div>
+            <div class="d1-row">
+              <div class="d1-name">Rent</div>
+              <div class="d1-right"><div class="d1-amt">700.00 EUR</div></div>
+            </div>
+            <div class="d1-row">
+              <div class="d1-name">Electricity</div>
+              <div class="d1-right"><div class="d1-amt">19.58 EUR</div><div class="d1-pdf">PDF</div></div>
+            </div>
+            <div class="d1-row">
+              <div class="d1-name">Water</div>
+              <div class="d1-right"><div class="d1-amt">10.32 EUR</div><div class="d1-pdf">PDF</div></div>
+            </div>
+            <div class="d1-row">
+              <div class="d1-name">Building fee</div>
+              <div class="d1-right"><div class="d1-amt">35.00 EUR</div><div class="d1-pdf">PDF</div></div>
+            </div>
+            <div class="d1-total">
+              <div class="d1-tl">Total due</div>
+              <div class="d1-ta">764.90 EUR</div>
+            </div>
+            <div class="d1-slabel">Pay via</div>
+            <div class="d1-tabs">
+              <div class="d1-tab on">IBAN</div>
+              <div class="d1-tab">IRIS Pay</div>
+              <div class="d1-tab">Revolut</div>
+            </div>
+            <div class="d1-tc">
+              <div class="d1-il">IBAN</div>
+              <div class="d1-iv">BG80 BNBG 9661 1020 3456 78</div>
+              <div class="d1-copy">Copy IBAN</div>
+            </div>
+          </div>
+          <div class="d1-cta">I've paid</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── D2 Structured Cards ── -->
+    <div class="direction">
+      <div class="dir-meta">
+        <div class="dir-num">Direction 2</div>
+        <div class="dir-name">Structured Cards</div>
+        <div class="dir-desc">Every item is a self-contained card with sub-label context. Primary-colour header establishes authority. The total card flips to primary background — clear hierarchy before the action.</div>
+      </div>
+      <div class="phone">
+        <div class="phone-inner d2">
+          <div class="d2-hd">
+            <div class="d2-back">← Billing history</div>
+            <div class="d2-title">April 2026</div>
+            <div class="d2-sub">4 charges · Awaiting payment</div>
+          </div>
+          <div class="d2-body">
+            <div class="d2-card">
+              <div class="d2-cl"><div class="d2-cn">Rent</div><div class="d2-cs">Fixed monthly</div></div>
+              <div class="d2-cr"><div class="d2-ca">700.00</div></div>
+            </div>
+            <div class="d2-card">
+              <div class="d2-cl"><div class="d2-cn">Electricity</div><div class="d2-cs">CEZ Electro Bulgaria</div></div>
+              <div class="d2-cr"><div class="d2-ca">19.58</div><div class="d2-cp">PDF</div></div>
+            </div>
+            <div class="d2-card">
+              <div class="d2-cl"><div class="d2-cn">Water</div><div class="d2-cs">Sofiyska Voda</div></div>
+              <div class="d2-cr"><div class="d2-ca">10.32</div><div class="d2-cp">PDF</div></div>
+            </div>
+            <div class="d2-card">
+              <div class="d2-cl"><div class="d2-cn">Building fee</div><div class="d2-cs">Monthly maintenance</div></div>
+              <div class="d2-cr"><div class="d2-ca">35.00</div><div class="d2-cp">PDF</div></div>
+            </div>
+            <div class="d2-total">
+              <div class="d2-tl">Total due</div>
+              <div class="d2-ta">764.90 EUR</div>
+            </div>
+            <div class="d2-pcard">
+              <div class="d2-pl">Payment methods</div>
+              <div class="d2-pm"><div class="d2-pn">IBAN transfer</div><div class="d2-pc">Copy</div></div>
+              <div class="d2-pm"><div class="d2-pn">IRIS Pay</div><div class="d2-pc">Copy</div></div>
+              <div class="d2-pm"><div class="d2-pn">Revolut.me</div><div class="d2-pc">Copy</div></div>
+            </div>
+            <div class="d2-cta">I've paid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── D3 Bold Action ── -->
+    <div class="direction">
+      <div class="dir-meta">
+        <div class="dir-num">Direction 3</div>
+        <div class="dir-name">Bold Action</div>
+        <div class="dir-desc">Dark stone header makes the total badge pop in mustard. High contrast — a user knows the total before reading a single line item. The CTA uses the same dark stone to bookend the screen.</div>
+      </div>
+      <div class="phone">
+        <div class="phone-inner d3">
+          <div class="d3-hd">
+            <div class="d3-back">← Billing</div>
+            <div class="d3-mo">April 2026</div>
+            <div class="d3-title">Your bills<br>this month</div>
+            <div class="d3-badge">
+              <div class="d3-bl">Total</div>
+              <div class="d3-ba">764.90</div>
+            </div>
+          </div>
+          <div class="d3-body">
+            <div class="d3-sl">Charges</div>
+            <div class="d3-item">
+              <div class="d3-in">Rent</div>
+              <div class="d3-ir"><div class="d3-ia">700.00 EUR</div></div>
+            </div>
+            <div class="d3-item">
+              <div class="d3-in">Electricity</div>
+              <div class="d3-ir"><div class="d3-ia">19.58 EUR</div><div class="d3-ip">PDF</div></div>
+            </div>
+            <div class="d3-item">
+              <div class="d3-in">Water</div>
+              <div class="d3-ir"><div class="d3-ia">10.32 EUR</div><div class="d3-ip">PDF</div></div>
+            </div>
+            <div class="d3-item">
+              <div class="d3-in">Building fee</div>
+              <div class="d3-ir"><div class="d3-ia">35.00 EUR</div><div class="d3-ip">PDF</div></div>
+            </div>
+            <div class="d3-sl">Pay with</div>
+            <div class="d3-pcard">
+              <div class="d3-pt">Choose a method</div>
+              <div class="d3-pr"><div class="d3-pn">IBAN transfer</div><div class="d3-pc">Copy →</div></div>
+              <div class="d3-pr"><div class="d3-pn">IRIS Pay</div><div class="d3-pc">Copy →</div></div>
+              <div class="d3-pr"><div class="d3-pn">Revolut.me</div><div class="d3-pc">Copy →</div></div>
+            </div>
+            <div class="d3-cta">
+              <div class="d3-ct">I've paid</div>
+              <div class="d3-ca">→</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── D4 Soft & Warm ── -->
+    <div class="direction">
+      <div class="dir-meta">
+        <div class="dir-num">Direction 4</div>
+        <div class="dir-name">Soft & Warm</div>
+        <div class="dir-desc">Gradient hero block makes the total feel important before anything else. Three payment method chips let the tenant select before copying. Most approachable and consumer-friendly of all directions.</div>
+      </div>
+      <div class="phone">
+        <div class="phone-inner d4">
+          <div class="d4-hd">
+            <div class="d4-back">← Billing history</div>
+            <div class="d4-title">April 2026</div>
+            <div class="d4-pill">Awaiting payment</div>
+          </div>
+          <div class="d4-body">
+            <div class="d4-hero">
+              <div class="d4-hl">Total due this month</div>
+              <div class="d4-hv">764.90 <span class="d4-he">EUR</span></div>
+            </div>
+            <div class="d4-bt">What's included</div>
+            <div class="d4-bill">
+              <div class="d4-bl2"><div class="d4-dot"></div><div class="d4-bn">Rent</div></div>
+              <div class="d4-br"><div class="d4-ba">700.00 EUR</div></div>
+            </div>
+            <div class="d4-bill">
+              <div class="d4-bl2"><div class="d4-dot"></div><div class="d4-bn">Electricity</div></div>
+              <div class="d4-br"><div class="d4-ba">19.58 EUR</div><div class="d4-bp">PDF</div></div>
+            </div>
+            <div class="d4-bill">
+              <div class="d4-bl2"><div class="d4-dot"></div><div class="d4-bn">Water</div></div>
+              <div class="d4-br"><div class="d4-ba">10.32 EUR</div><div class="d4-bp">PDF</div></div>
+            </div>
+            <div class="d4-bill">
+              <div class="d4-bl2"><div class="d4-dot"></div><div class="d4-bn">Building fee</div></div>
+              <div class="d4-br"><div class="d4-ba">35.00 EUR</div><div class="d4-bp">PDF</div></div>
+            </div>
+            <div class="d4-pt">Pay with</div>
+            <div class="d4-chips">
+              <div class="d4-chip on"><div class="d4-cn2">IBAN</div><div class="d4-cs2">Bank transfer</div></div>
+              <div class="d4-chip"><div class="d4-cn2">IRIS Pay</div><div class="d4-cs2">Instant A2A</div></div>
+              <div class="d4-chip"><div class="d4-cn2">Revolut</div><div class="d4-cs2">revolut.me</div></div>
+            </div>
+            <div class="d4-cta">I've paid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── D5 Compact Efficient ── -->
+    <div class="direction">
+      <div class="dir-meta">
+        <div class="dir-num">Direction 5</div>
+        <div class="dir-name">Compact Efficient</div>
+        <div class="dir-desc">Standard top navigation, tight list layout, everything visible without scrolling. Built for the user who knows exactly what they're doing. Feels like a professional tool, not a consumer app.</div>
+      </div>
+      <div class="phone">
+        <div class="phone-inner d5">
+          <div class="d5-nav">
+            <div class="d5-nb">← Back</div>
+            <div class="d5-nt">April 2026</div>
+            <div class="d5-nr">History</div>
+          </div>
+          <div class="d5-body">
+            <div class="d5-period">
+              <div class="d5-pl">Billing period</div>
+              <div class="d5-ps">Unpaid</div>
+            </div>
+            <div class="d5-list">
+              <div class="d5-row">
+                <div class="d5-rn">Rent</div>
+                <div class="d5-ra">700.00 EUR</div>
+                <div class="d5-ri" style="background:transparent;"></div>
+              </div>
+              <div class="d5-row">
+                <div class="d5-rn">Electricity</div>
+                <div class="d5-ra">19.58 EUR</div>
+                <div class="d5-ri">PDF</div>
+              </div>
+              <div class="d5-row">
+                <div class="d5-rn">Water</div>
+                <div class="d5-ra">10.32 EUR</div>
+                <div class="d5-ri">PDF</div>
+              </div>
+              <div class="d5-row">
+                <div class="d5-rn">Building fee</div>
+                <div class="d5-ra">35.00 EUR</div>
+                <div class="d5-ri">PDF</div>
+              </div>
+            </div>
+            <div class="d5-total">
+              <div class="d5-tl">Total due</div>
+              <div class="d5-ta">764.90 EUR</div>
+            </div>
+            <div class="d5-pblock">
+              <div class="d5-phd">Pay via</div>
+              <div class="d5-pr"><div class="d5-pn">IBAN transfer</div><div class="d5-pc">Copy</div></div>
+              <div class="d5-pr"><div class="d5-pn">IRIS Pay</div><div class="d5-pc">Copy</div></div>
+              <div class="d5-pr"><div class="d5-pn">Revolut.me</div><div class="d5-pc">Copy</div></div>
+            </div>
+            <div class="d5-cta">I've paid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── D6 Split Zones ── -->
+    <div class="direction">
+      <div class="dir-meta">
+        <div class="dir-num">Direction 6</div>
+        <div class="dir-name">Split Zones</div>
+        <div class="dir-desc">Horizontally scrollable bill chips in the primary-colour top zone. Cream bottom for payment selection and action. Two clear cognitive phases: understand, then act. Most spatially distinctive direction.</div>
+      </div>
+      <div class="phone">
+        <div class="phone-inner d6">
+          <div class="d6-top">
+            <div class="d6-back">← Billing history</div>
+            <div class="d6-mo">April 2026</div>
+            <div class="d6-amt">764.90 <span class="d6-eur">EUR</span></div>
+            <div class="d6-sub">4 charges · Awaiting payment</div>
+            <div class="d6-chips">
+              <div class="d6-chip"><div class="d6-cn">Rent</div><div class="d6-ca">700.00</div></div>
+              <div class="d6-chip"><div class="d6-cn">Electricity</div><div class="d6-ca">19.58</div><div class="d6-cp">View PDF</div></div>
+              <div class="d6-chip"><div class="d6-cn">Water</div><div class="d6-ca">10.32</div><div class="d6-cp">View PDF</div></div>
+              <div class="d6-chip"><div class="d6-cn">Building fee</div><div class="d6-ca">35.00</div><div class="d6-cp">View PDF</div></div>
+            </div>
+          </div>
+          <div class="d6-bottom">
+            <div class="d6-bt">How would you like to pay?</div>
+            <div class="d6-opt">
+              <div class="d6-ol">
+                <div class="d6-icon">IB</div>
+                <div><div class="d6-on">IBAN transfer</div><div class="d6-os">BG80 BNBG ···· 3456 78</div></div>
+              </div>
+              <div class="d6-oc">Copy</div>
+            </div>
+            <div class="d6-opt">
+              <div class="d6-ol">
+                <div class="d6-icon">IR</div>
+                <div><div class="d6-on">IRIS Pay</div><div class="d6-os">+359 88 ··· ·· 12</div></div>
+              </div>
+              <div class="d6-oc">Copy</div>
+            </div>
+            <div class="d6-opt">
+              <div class="d6-ol">
+                <div class="d6-icon">RV</div>
+                <div><div class="d6-on">Revolut.me</div><div class="d6-os">revolut.me/kiril</div></div>
+              </div>
+              <div class="d6-oc">Copy</div>
+            </div>
+            <div class="d6-cta">I've paid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
