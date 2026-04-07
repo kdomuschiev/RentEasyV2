@@ -10,3 +10,4 @@
 ## Pull Requests
 
 - After every commit, create a PR from the current branch into `main` using `gh pr create` — only if a PR for that branch does not already exist
+- PR titles must follow the format: `[feat] Short description` or `[fix] Short description` (matching the branch type)
