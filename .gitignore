@@ -32,6 +32,7 @@ obj/
 *.vs/
 publish/
 *.nupkg
+appsettings.Development.json
 
 # Node / Angular / React
 node_modules/

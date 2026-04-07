@@ -1,0 +1,38 @@
+name: Deploy API to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'renteasy-api/**'
+      - '.github/workflows/api-deploy.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore renteasy-api/renteasy-api.csproj
+
+      - name: Build
+        run: dotnet build renteasy-api/renteasy-api.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish renteasy-api/renteasy-api.csproj --configuration Release --no-build --output ./publish
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: renteasy-api
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
