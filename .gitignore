@@ -1,0 +1,50 @@
+# Claude Code local config (machine-specific)
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Python (used by BMad scripts)
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+# .NET / C#
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+publish/
+*.nupkg
+
+# Node / Angular / React
+node_modules/
+dist/
+.next/
+npm-debug.log*
+yarn-error.log*
+.yarn/cache
+
+# Azure
+.azure/
+local.settings.json
+
+# Logs
+*.log
+logs/
