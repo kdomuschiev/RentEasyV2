@@ -1,0 +1,105 @@
+# generated: 2026-04-07
+# last_updated: 2026-04-07
+# project: RentEasyV2
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-04-07
+last_updated: 2026-04-07
+project: RentEasyV2
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Deployable Foundation — Production-Ready Application Shell
+  epic-1: in-progress
+  1-1-monorepo-scaffold-and-cicd-pipeline: ready-for-dev
+  1-2-database-schema-and-ef-core-foundation: backlog
+  1-3-authentication-api: backlog
+  1-4-nextjs-bff-auth-layer-and-i18n-routing: backlog
+  1-5-login-and-authentication-ui: backlog
+  1-6-design-system-foundation: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Property Setup & Tenant Onboarding
+  epic-2: backlog
+  2-1-property-and-payment-method-api: backlog
+  2-2-welcome-pack-api: backlog
+  2-3-property-setup-ui: backlog
+  2-4-tenant-account-creation-and-invitation-email: backlog
+  2-5-tenant-first-login-welcome-pack-and-portal-navigation: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Monthly Billing Loop — Core Product Value
+  epic-3: backlog
+  3-1-bill-period-and-file-storage-api: backlog
+  3-2-payment-confirmation-and-receipt-pdf-generation: backlog
+  3-3-billing-email-notifications-and-payment-nudge-scheduler: backlog
+  3-4-tenant-billing-screen: backlog
+  3-5-payment-method-display: backlog
+  3-6-ive-paid-flow-and-landlord-payment-confirmation-ui: backlog
+  3-7-payment-history-view: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Condition Reports — Joint Legal Record
+  epic-4: backlog
+  4-1-condition-report-data-model-and-landlord-pre-load-api: backlog
+  4-2-condition-report-agree-disagree-api-and-pdf-generation: backlog
+  4-4-condition-report-nudge-scheduler: backlog
+  4-5-safety-intro-screen-and-tenant-condition-report-view: backlog
+  4-6-tenant-agree-disagree-and-dispute-ui-and-landlord-review-ui: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Maintenance Requests
+  epic-5: backlog
+  5-1-maintenance-request-api: backlog
+  5-2-tenant-maintenance-request-submission-ui: backlog
+  5-3-landlord-maintenance-management-ui: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Move-Out & End of Tenancy
+  epic-6: backlog
+  6-1-move-out-api-and-account-state-transitions: backlog
+  6-2-final-pdf-bundle-generation-and-move-out-emails: backlog
+  6-3-move-out-condition-report-and-tenancy-expiry-job: backlog
+  6-4-move-out-ui: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Public Showcase Page
+  epic-7: backlog
+  7-1-waitlist-api-and-database: backlog
+  7-2-showcase-page-editorial-design: backlog
+  7-3-waitlist-form-landlord-interest-cta-and-ghost-login: backlog
+  7-4-seo-performance-and-language-toggle: backlog
+  epic-7-retrospective: optional
