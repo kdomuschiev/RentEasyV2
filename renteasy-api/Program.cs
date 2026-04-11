@@ -1,4 +1,6 @@
 
+using Scalar.AspNetCore;
+
 namespace renteasy_api;
 
 public class Program
@@ -23,6 +25,7 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+            app.MapScalarApiReference();
         }
 
         app.UseHttpsRedirection();

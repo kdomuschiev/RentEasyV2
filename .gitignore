@@ -1,6 +1,9 @@
 # Claude Code local config (machine-specific)
 .claude/
 
+# Local docs (not for version control)
+README.md
+
 # OS
 .DS_Store
 Thumbs.db
