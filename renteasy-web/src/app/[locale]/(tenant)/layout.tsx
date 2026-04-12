@@ -1,0 +1,32 @@
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+export default async function TenantLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const cookieStore = await cookies()
+  const token = cookieStore.get('jwt')?.value
+
+  if (!token) redirect(`/${locale}/login`)
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(token.split('.')[1], 'base64url').toString('utf-8')
+    ) as { role: string; account_state: string }
+
+    if (payload.role !== 'Tenant') redirect(`/${locale}/login`)
+
+    if (payload.account_state === 'Expired') redirect(`/${locale}/expired`)
+
+    if (payload.account_state === 'RequiresPasswordChange') redirect(`/${locale}/change-password`)
+  } catch {
+    redirect(`/${locale}/login`)
+  }
+
+  return <>{children}</>
+}
