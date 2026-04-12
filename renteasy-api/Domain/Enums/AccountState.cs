@@ -4,5 +4,6 @@ public enum AccountState
 {
     Active,
     ReadOnly,
-    Expired
+    Expired,
+    RequiresPasswordChange
 }

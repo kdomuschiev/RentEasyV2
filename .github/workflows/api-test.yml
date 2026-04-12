@@ -1,0 +1,37 @@
+name: Test API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'renteasy-api/**'
+      - 'renteasy-api.Tests/**'
+      - '.github/workflows/api-test.yml'
+  pull_request:
+    paths:
+      - 'renteasy-api/**'
+      - 'renteasy-api.Tests/**'
+      - '.github/workflows/api-test.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore renteasy-api.Tests/renteasy-api.Tests.csproj
+
+      - name: Build
+        run: dotnet build renteasy-api.Tests/renteasy-api.Tests.csproj --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test renteasy-api.Tests/renteasy-api.Tests.csproj --configuration Release --no-build --verbosity normal
