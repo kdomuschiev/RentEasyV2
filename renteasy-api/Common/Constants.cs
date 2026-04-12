@@ -8,4 +8,6 @@ public static class Constants
     public const int NudgeJobPollingIntervalMinutes = 5;
     public const int MaxConditionReportDisputeRounds = 3;
     public const int TenancyExpiryMonths = 12;
+    public const int JwtExpiryDays = 7;
+    public const int PasswordResetTokenExpiryHours = 1;
 }
