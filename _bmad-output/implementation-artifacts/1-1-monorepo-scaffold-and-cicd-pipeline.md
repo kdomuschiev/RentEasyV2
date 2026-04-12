@@ -1,6 +1,6 @@
 # Story 1.1: Monorepo Scaffold & CI/CD Pipeline
 
-Status: review
+Status: done
 
 ## Story
 
