@@ -66,8 +66,18 @@ public class AuthController : ControllerBase
 
         // Return new token so client can use it immediately
         var newToken = await _authService.GenerateNewTokenAsync(userId);
+        if (newToken == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Internal Server Error",
+                Status = StatusCodes.Status500InternalServerError,
+                Detail = "Failed to generate new token."
+            });
+        }
 
-        return Ok(new { token = newToken });
+        return Ok(new ChangePasswordResponse { Token = newToken });
     }
 
     [HttpPost("forgot-password")]

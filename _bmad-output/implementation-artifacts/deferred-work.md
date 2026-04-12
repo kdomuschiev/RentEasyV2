@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of 1-3-authentication-api (2026-04-12)
+
+- **landlord_id claim missing from Tenant JWTs** — `AppDbContext.GetCurrentLandlordId()` throws `UnauthorizedAccessException` if the `landlord_id` claim is absent. The comment in AppDbContext already states tenants need this claim pointing to their landlord's ID. `AuthService.GenerateJwt()` only adds it for Landlords. Must be completed in Story 2.4 (Tenant Account Creation) when the tenant→landlord association is established and the claim can be populated.
+- **DB call per authenticated request in TokenValidFromMiddleware** — every request incurs an extra round-trip to load the user for `TokenValidFrom` validation. Acceptable at V1 Neon free-tier load, but note as a known scaling constraint. Revisit if query volume becomes a concern post-launch.
+
 ## Deferred from: code review of 1-2-database-schema-and-ef-core-foundation (2026-04-11)
 
 - **Payment.TenancyId absent** — when a landlord has multiple tenancies, service code must traverse Payment→BillPeriod→Tenancy to verify cross-tenant access; no direct FK shortcut. Address when billing endpoints are built (Story 3.x).

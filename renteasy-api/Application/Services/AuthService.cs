@@ -37,6 +37,10 @@ public class AuthService
         if (!passwordValid)
             return null;
 
+        // Block expired accounts — access fully revoked (ReadOnly users can still log in to view data)
+        if (user.AccountState == AccountState.Expired)
+            return null;
+
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "Tenant";
 
@@ -63,12 +67,18 @@ public class AuthService
             return (false, errors);
         }
 
-        user.TokenValidFrom = DateTimeOffset.UtcNow;
+        // Truncate to Unix-second boundary so iat >= TokenValidFrom holds for freshly issued tokens
+        user.TokenValidFrom = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
         if (user.AccountState == AccountState.RequiresPasswordChange)
             user.AccountState = AccountState.Active;
 
-        await _userManager.UpdateAsync(user);
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            var updateErrors = string.Join(" ", updateResult.Errors.Select(e => e.Description));
+            return (false, updateErrors);
+        }
 
         return (true, null);
     }
@@ -94,17 +104,20 @@ public class AuthService
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return (false, "Invalid reset request.");
+            return (false, "Invalid or expired reset token.");
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
         if (!result.Succeeded)
-        {
-            var errors = string.Join(" ", result.Errors.Select(e => e.Description));
-            return (false, errors);
-        }
+            return (false, "Invalid or expired reset token.");
 
-        user.TokenValidFrom = DateTimeOffset.UtcNow;
-        await _userManager.UpdateAsync(user);
+        // Truncate to Unix-second boundary so iat >= TokenValidFrom holds for freshly issued tokens
+        user.TokenValidFrom = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            var updateErrors = string.Join(" ", updateResult.Errors.Select(e => e.Description));
+            return (false, updateErrors);
+        }
 
         return (true, null);
     }

@@ -49,6 +49,28 @@ public class TokenValidFromMiddleware
                     return;
                 }
             }
+            else
+            {
+                // Authenticated token is missing required iat or sub claims — treat as invalid
+                context.Response.ContentType = "application/problem+json";
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                var problem = new ProblemDetails
+                {
+                    Type = "https://tools.ietf.org/html/rfc7807",
+                    Title = "Unauthorized",
+                    Status = StatusCodes.Status401Unauthorized,
+                    Detail = "Token is missing required claims."
+                };
+
+                var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
+                await context.Response.WriteAsync(json);
+                return;
+            }
         }
 
         await _next(context);

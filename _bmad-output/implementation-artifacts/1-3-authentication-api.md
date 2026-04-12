@@ -1,6 +1,6 @@
 # Story 1.3: Authentication API (Login, Password Change, Password Reset)
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -331,6 +331,22 @@ Claude Opus 4.6 (1M context)
 - `renteasy-api.Tests/Common/Middleware/ErrorHandlingMiddlewareTests.cs` — NEW (3 tests)
 - `renteasy-api.Tests/Common/Middleware/TokenValidFromMiddlewareTests.cs` — NEW (4 tests)
 - `renteasy-api.Tests/Common/Middleware/RequiresPasswordChangeMiddlewareTests.cs` — NEW (5 tests)
+
+### Review Findings
+
+- [x] [Review][Decision] Login endpoint does not check AccountState — **resolved**: block Expired accounts at login; ReadOnly users may still authenticate — fixed in LoginAsync
+- [x] [Review][Patch] UpdateAsync result ignored after setting TokenValidFrom — ChangePassword and ResetPassword silently succeed even if the DB update fails [renteasy-api/Application/Services/AuthService.cs ~75, ~106]
+- [x] [Review][Patch] Reset-password leaks email existence — returns "Invalid reset request." for unknown emails (400) vs Identity errors for bad token (different detail), enabling enumeration [renteasy-api/Application/Services/AuthService.cs ~95]
+- [x] [Review][Patch] PasswordResetTokenExpiryHours constant is dead code — never wired into Identity token lifetime (default remains 1 day, not 1 hour) [renteasy-api/Program.cs]
+- [x] [Review][Patch] TokenValidFromMiddleware silently passes through when iat or sub claims are missing — should treat missing claims as a validation failure (401) [renteasy-api/Common/Middleware/TokenValidFromMiddleware.cs]
+- [x] [Review][Patch] GenerateNewTokenAsync returns null if user is deleted mid-request — ChangePassword controller returns Ok({token: null}) without error [renteasy-api/Controllers/AuthController.cs ~68]
+- [x] [Review][Patch] ChangePassword response uses anonymous type instead of typed DTO — not discoverable, not testable, fragile to serialisation policy changes [renteasy-api/Controllers/AuthController.cs ~73]
+- [x] [Review][Patch] Seeded landlord account does not explicitly set TokenValidFrom — relies on default(DateTimeOffset) being MinValue; should be set explicitly for resilience [renteasy-api/Program.cs, SeedDataAsync]
+- [x] [Review][Patch] JWT auth silently disabled with no startup error when Jwt:Key is empty — all [Authorize] endpoints become public with no warning in non-development environments [renteasy-api/Program.cs]
+- [x] [Review][Patch] Sub-second race between iat truncation and TokenValidFrom in change-password flow — new token iat (Unix seconds, truncated) can be < TokenValidFrom (sub-second precision), causing immediate 401 after password change [renteasy-api/Application/Services/AuthService.cs, renteasy-api/Controllers/AuthController.cs]
+
+- [x] [Review][Defer] landlord_id claim missing from Tenant JWTs — AppDbContext.GetCurrentLandlordId() throws if claim absent; needs to be addressed in Story 2.4 when tenant creation is built [renteasy-api/Application/Services/AuthService.cs] — deferred, pre-existing design gap for V1 tenant scope
+- [x] [Review][Defer] DB call per authenticated request in TokenValidFromMiddleware — known V1 scaling constraint; acceptable at current Neon free-tier load [renteasy-api/Common/Middleware/TokenValidFromMiddleware.cs] — deferred, pre-existing
 
 ### Change Log
 - 2026-04-12: Implemented full authentication API — JWT login, change password, forgot/reset password, three middleware (error handling, token validation, password change enforcement), CORS policy, role/account seeder, EF Core migration

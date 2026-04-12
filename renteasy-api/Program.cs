@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using renteasy_api.Application.Services;
+using renteasy_api.Common;
 using renteasy_api.Common.Middleware;
 using renteasy_api.Domain.Entities;
 using renteasy_api.Domain.Enums;
@@ -50,10 +51,21 @@ public class Program
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+        // Wire up password reset token expiry from Constants
+        builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromHours(Constants.PasswordResetTokenExpiryHours));
+
         // Configure JWT authentication
         var jwtSection = builder.Configuration.GetSection("Jwt");
         var jwtKey = jwtSection["Key"];
-        if (!string.IsNullOrEmpty(jwtKey))
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            if (!builder.Environment.IsDevelopment())
+                throw new InvalidOperationException(
+                    "Jwt:Key is not configured. Set it via Azure App Service application settings.");
+            // Development with no key — auth disabled; set Jwt:Key in appsettings.Development.json to enable
+        }
+        else
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -152,7 +164,8 @@ public class Program
                     UserName = landlordEmail,
                     Email = landlordEmail,
                     EmailConfirmed = true,
-                    AccountState = AccountState.Active
+                    AccountState = AccountState.Active,
+                    TokenValidFrom = DateTimeOffset.MinValue
                 };
 
                 var result = await userManager.CreateAsync(landlord, landlordPassword);
