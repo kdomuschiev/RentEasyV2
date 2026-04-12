@@ -52,6 +52,22 @@ describe('POST /api/auth/login', () => {
     )
   })
 
+  it('returns 400 when request body is malformed JSON', async () => {
+    const { POST } = await import('./route')
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: 'not-json',
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    const response = await POST(request)
+    const body = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(body).toEqual({ error: 'Invalid request body' })
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
   it('forwards non-200 responses from the API unchanged', async () => {
     const problemDetails = {
       type: 'https://tools.ietf.org/html/rfc7807',

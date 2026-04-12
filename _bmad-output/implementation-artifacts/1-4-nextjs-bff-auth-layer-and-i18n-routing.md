@@ -1,6 +1,6 @@
 # Story 1.4: Next.js BFF Auth Layer & i18n Routing
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -467,6 +467,16 @@ claude-sonnet-4-6
 - `renteasy-web/src/messages/bg.json` (modified — added common keys)
 - `renteasy-web/src/messages/en.json` (modified — added common keys)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` (modified — 1-4 in-progress → review)
+
+### Review Findings
+
+- [x] [Review][Defer] Language toggle AC5 — LanguageToggle UI component deferred to Story 1.5/1.6; routing infrastructure (proxy, i18n config) is in place — deferred, intentional
+- [x] [Review][Patch] `RequiresPasswordChange` account state not handled in layout guards — neither `(tenant)/layout.tsx` nor `(landlord)/layout.tsx` redirect when `account_state === 'RequiresPasswordChange'`; the user lands in the full authenticated app without being forced to change their password [src/app/[locale]/(tenant)/layout.tsx, src/app/[locale]/(landlord)/layout.tsx]
+- [x] [Review][Patch] `request.json()` in login route has no try/catch — malformed JSON body throws an unhandled exception and returns 500 instead of a clean 400 [src/app/api/auth/login/route.ts]
+- [x] [Review][Patch] `RENTEASY_API_URL` undefined causes cryptic fetch error — no startup or runtime guard; missing env var silently produces `"undefined/api/auth/..."` URL and a non-descriptive TypeError [src/app/api/auth/login/route.ts, src/lib/api.ts]
+- [x] [Review][Defer] JWT decode logic duplicated — `decodeJwtPayload` in `me/route.ts` and inline `Buffer.from` decode in both layout guards are independent implementations; shape changes will diverge silently — deferred, pre-existing
+- [x] [Review][Defer] `/api/auth/me` returns HTTP 200 with `undefined` role/accountState when JWT payload lacks expected claims — low risk (token always issued by API), but no defensive check — deferred, pre-existing
+- [x] [Review][Defer] `apiRequest` unconditionally sets `Content-Type: application/json` on GET requests — technically invalid header for bodyless requests — deferred, pre-existing
 
 ### Change Log
 

@@ -22,6 +22,8 @@ export default async function TenantLayout({
     if (payload.role !== 'Tenant') redirect(`/${locale}/login`)
 
     if (payload.account_state === 'Expired') redirect(`/${locale}/expired`)
+
+    if (payload.account_state === 'RequiresPasswordChange') redirect(`/${locale}/change-password`)
   } catch {
     redirect(`/${locale}/login`)
   }

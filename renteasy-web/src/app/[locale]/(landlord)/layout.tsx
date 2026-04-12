@@ -20,6 +20,8 @@ export default async function LandlordLayout({
     ) as { role: string; account_state: string }
 
     if (payload.role !== 'Landlord') redirect(`/${locale}/login`)
+
+    if (payload.account_state === 'RequiresPasswordChange') redirect(`/${locale}/change-password`)
   } catch {
     redirect(`/${locale}/login`)
   }

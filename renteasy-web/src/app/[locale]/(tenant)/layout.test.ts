@@ -87,4 +87,18 @@ describe('TenantLayout auth guard', () => {
 
     expect(mockRedirect).not.toHaveBeenCalled()
   })
+
+  it('redirects to change-password when accountState is RequiresPasswordChange', async () => {
+    mockCookiesGet.mockReturnValue({
+      value: makeToken({ role: 'Tenant', account_state: 'RequiresPasswordChange' }),
+    })
+    const { default: TenantLayout } = await import('./layout')
+
+    await TenantLayout({
+      children: null,
+      params: Promise.resolve({ locale: 'bg' }),
+    })
+
+    expect(mockRedirect).toHaveBeenCalledWith('/bg/change-password')
+  })
 })

@@ -1,5 +1,8 @@
 import { cookies } from 'next/headers'
 
+const API_URL = process.env.RENTEASY_API_URL
+if (!API_URL) throw new Error('RENTEASY_API_URL environment variable is not set')
+
 export async function apiRequest(path: string, init?: RequestInit): Promise<Response> {
   const cookieStore = await cookies()
   const token = cookieStore.get('jwt')?.value
@@ -13,7 +16,7 @@ export async function apiRequest(path: string, init?: RequestInit): Promise<Resp
     headers['Authorization'] = `Bearer ${token}`
   }
 
-  return fetch(`${process.env.RENTEASY_API_URL}${path}`, {
+  return fetch(`${API_URL}${path}`, {
     ...init,
     headers,
   })

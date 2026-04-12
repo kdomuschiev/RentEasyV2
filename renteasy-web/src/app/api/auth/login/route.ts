@@ -1,10 +1,18 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
-  const body = await request.json()
+const API_URL = process.env.RENTEASY_API_URL
+if (!API_URL) throw new Error('RENTEASY_API_URL environment variable is not set')
 
-  const apiResponse = await fetch(`${process.env.RENTEASY_API_URL}/api/auth/login`, {
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  const apiResponse = await fetch(`${API_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
