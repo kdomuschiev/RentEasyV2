@@ -1,6 +1,6 @@
 # Story 1.2: Database Schema & EF Core Foundation
 
-**Status:** review
+**Status:** done
 **Epic:** 1 — Deployable Foundation
 **Story Key:** 1-2-database-schema-and-ef-core-foundation
 
@@ -650,6 +650,26 @@ claude-sonnet-4-6
 - `renteasy-api.Tests/Infrastructure/Data/AppDbContextTests.cs` (new)
 - `RentEasyV2.sln` (modified — test project added)
 
+### Review Findings
+
+- [x] [Review][Decision] HasQueryFilter breaks non-HTTP contexts — resolved: keep current design; background jobs must use `IgnoreQueryFilters()` explicitly. EF Core doesn't evaluate filters during migrations. Contract documented for Stories 3.3+/4.4.
+- [x] [Review][Decision] ConditionReport missing ReportType discriminator — resolved: defer to Story 4.1 (Condition Report Data Model). Foundation schema is valid; ReportType enum + unique constraint added when the full condition report flow is designed.
+- [x] [Review][Patch] GetCurrentLandlordId() falls back silently to NameIdentifier — removed NameIdentifier fallback; added empty-string guard. [AppDbContext.cs]
+- [x] [Review][Patch] TokenValidFrom defaults to DateTimeOffset.MinValue — added `= DateTimeOffset.UtcNow` entity-level default. [ApplicationUser.cs]
+- [x] [Review][Patch] AC3 test passes vacuously — rewrote to share a single named in-memory DB between seed and query contexts. [AppDbContextTests.cs]
+- [x] [Review][Patch] AC4 cross-isolation test has orphaned seed data — removed orphaned seedContextA; both landlords seed into shared DB directly. [AppDbContextTests.cs]
+- [x] [Review][Patch] Missing HasDefaultValue for enum DB columns — added HasDefaultValue for AccountState (Active) and ConditionReport.Status (InProgress). Bill.Category and NudgeType intentionally have no default (must be set explicitly). [AppDbContext.cs]
+- [x] [Review][Patch] MaintenanceRequest.TenantId missing navigation property — added `Tenant` navigation to ApplicationUser. [MaintenanceRequest.cs]
+- [x] [Review][Patch] PhotoBlobPaths fields have no max-length constraint — added HasMaxLength(8192) for ConditionReportItem and MaintenanceRequest. [AppDbContext.cs]
+- [x] [Review][Patch] Property.SizeSqm (decimal?) missing HasPrecision — added HasPrecision(18, 2). [AppDbContext.cs]
+- [x] [Review][Defer] Payment.TenancyId absent — cross-tenant service-layer concern when a landlord has multiple tenancies; service code will need to traverse Payment→BillPeriod→Tenancy. Deferred to billing story.
+- [x] [Review][Defer] Empty connection string placeholders in appsettings.json — expected per spec (real values in git-ignored appsettings.Development.json); startup validation guard optional, deferred.
+- [x] [Review][Defer] WelcomePack.Content unbounded string / XSS — rendering concern addressed at UI story level, not schema.
+- [x] [Review][Defer] EmailNudgeJob.TenancyId has no FK cascade — intentional per spec design (bare Guid, no navigation property).
+- [x] [Review][Defer] No CORS policy in Program.cs — needed for cross-domain SWA→API calls; deferred to Story 1.3 (auth API) where the allowed origin will be known.
+- [x] [Review][Defer] MigrationConnection not wired to IDesignTimeDbContextFactory — workaround via `--connection` flag documented in dev notes; deferred.
+
 ## Change Log
 - 2026-04-11: Story created by bmad-create-story
 - 2026-04-11: Story implemented by dev agent (claude-sonnet-4-6) — all tasks complete, 4 tests passing, migration applied to Neon
+- 2026-04-11: Code review by claude-sonnet-4-6 — 2 decision-needed, 8 patch, 6 deferred, 3 dismissed

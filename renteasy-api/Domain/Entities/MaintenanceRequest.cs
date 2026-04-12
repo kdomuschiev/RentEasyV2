@@ -16,4 +16,5 @@ public class MaintenanceRequest
     public DateTimeOffset UpdatedAt { get; set; }
 
     public Tenancy Tenancy { get; set; } = null!;
+    public ApplicationUser Tenant { get; set; } = null!;
 }

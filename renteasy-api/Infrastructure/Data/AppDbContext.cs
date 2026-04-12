@@ -35,14 +35,13 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
         if (user == null || user.Identity?.IsAuthenticated != true)
             throw new UnauthorizedAccessException("No authenticated user context available for query filter.");
 
-        // JWT will contain "landlord_id" claim for both landlord and tenant roles (set in Story 1.3)
+        // JWT must contain "landlord_id" claim for both landlord and tenant roles (set in Story 1.3)
         // - Landlord: landlord_id = their own user ID
         // - Tenant: landlord_id = their associated landlord's user ID
-        var landlordIdClaim = user.FindFirst("landlord_id")?.Value
-            ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var landlordIdClaim = user.FindFirst("landlord_id")?.Value;
 
-        if (!Guid.TryParse(landlordIdClaim, out var landlordId))
-            throw new UnauthorizedAccessException("Cannot determine landlord context from token.");
+        if (string.IsNullOrWhiteSpace(landlordIdClaim) || !Guid.TryParse(landlordIdClaim, out var landlordId))
+            throw new UnauthorizedAccessException("Cannot determine landlord context from token — missing or invalid landlord_id claim.");
 
         return landlordId;
     }
@@ -51,14 +50,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     {
         base.OnModelCreating(builder);
 
-        // Enums as strings
+        // Enums as strings with DB-level defaults where applicable
         builder.Entity<ApplicationUser>()
             .Property(u => u.AccountState)
-            .HasConversion<string>();
+            .HasConversion<string>()
+            .HasDefaultValue(AccountState.Active);
 
         builder.Entity<ConditionReport>()
             .Property(r => r.Status)
-            .HasConversion<string>();
+            .HasConversion<string>()
+            .HasDefaultValue(ConditionReportStatus.InProgress);
 
         builder.Entity<Bill>()
             .Property(b => b.Category)
@@ -78,7 +79,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             .Property(j => j.NudgeType)
             .HasConversion<string>();
 
-        // Decimal precision for money — NEVER float/double
+        // Decimal precision — NEVER float/double
         builder.Entity<Bill>()
             .Property(b => b.Amount)
             .HasPrecision(18, 2);
@@ -86,6 +87,19 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
         builder.Entity<Payment>()
             .Property(p => p.AmountConfirmed)
             .HasPrecision(18, 2);
+
+        builder.Entity<Property>()
+            .Property(p => p.SizeSqm)
+            .HasPrecision(18, 2);
+
+        // Max-length for JSON blob path arrays
+        builder.Entity<ConditionReportItem>()
+            .Property(e => e.PhotoBlobPaths)
+            .HasMaxLength(8192);
+
+        builder.Entity<MaintenanceRequest>()
+            .Property(e => e.PhotoBlobPaths)
+            .HasMaxLength(8192);
 
         // Unique constraints
         builder.Entity<WelcomePack>()
