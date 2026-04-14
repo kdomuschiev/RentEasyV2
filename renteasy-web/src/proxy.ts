@@ -6,6 +6,7 @@ const routing = defineRouting({
   locales: ['bg', 'en'],
   defaultLocale: 'bg',
   localePrefix: 'always',
+  localeDetection: false,
 })
 
 const intlProxy = createMiddleware(routing)
