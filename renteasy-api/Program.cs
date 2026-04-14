@@ -84,7 +84,7 @@ public class Program
                     ValidAudience = jwtSection["Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                     NameClaimType = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub,
-                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                    RoleClaimType = "role"
                 };
             });
         }
