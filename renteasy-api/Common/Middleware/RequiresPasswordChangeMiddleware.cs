@@ -23,7 +23,7 @@ public class RequiresPasswordChangeMiddleware
                 var path = context.Request.Path.Value?.ToLowerInvariant() ?? "";
                 var method = context.Request.Method;
 
-                if (!(method == "POST" && path == "/api/auth/change-password"))
+                if (!(method == "POST" && (path == "/api/auth/change-password" || path == "/api/auth/forced-change-password")))
                 {
                     context.Response.ContentType = "application/problem+json";
                     context.Response.StatusCode = StatusCodes.Status403Forbidden;

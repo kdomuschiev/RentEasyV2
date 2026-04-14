@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using renteasy_api.Application.DTOs.Auth;
 using renteasy_api.Application.Services;
+using renteasy_api.Domain.Enums;
 
 namespace renteasy_api.Controllers;
 
@@ -30,6 +31,71 @@ public class AuthController : ControllerBase
                 Title = "Unauthorized",
                 Status = StatusCodes.Status401Unauthorized,
                 Detail = "Invalid email or password."
+            });
+        }
+
+        return Ok(response);
+    }
+
+    [Authorize]
+    [HttpPost("forced-change-password")]
+    public async Task<IActionResult> ForcedChangePassword([FromBody] ForcedChangePasswordRequest request)
+    {
+        var accountState = User.FindFirst("account_state")?.Value;
+        if (accountState == null)
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Unauthorized",
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = "Invalid token."
+            });
+        }
+        if (accountState != AccountState.RequiresPasswordChange.ToString())
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Forbidden",
+                Status = StatusCodes.Status403Forbidden,
+                Detail = "This endpoint is only available for accounts requiring a password change."
+            });
+        }
+
+        if (string.IsNullOrEmpty(request.NewPassword) || request.NewPassword.Length < 8
+            || !request.NewPassword.Any(char.IsLetter) || !request.NewPassword.Any(char.IsDigit))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Password must be at least 8 characters and contain at least one letter and one digit."
+            });
+        }
+
+        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Unauthorized",
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = "Invalid token."
+            });
+        }
+
+        var (success, error, response) = await _authService.ForcedChangePasswordAsync(userId, request.NewPassword);
+        if (!success || response == null)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = error
             });
         }
 
@@ -64,9 +130,8 @@ public class AuthController : ControllerBase
             });
         }
 
-        // Return new token so client can use it immediately
-        var newToken = await _authService.GenerateNewTokenAsync(userId);
-        if (newToken == null)
+        var newTokenResponse = await _authService.GenerateNewTokenAsync(userId);
+        if (newTokenResponse == null)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
@@ -77,7 +142,12 @@ public class AuthController : ControllerBase
             });
         }
 
-        return Ok(new ChangePasswordResponse { Token = newToken });
+        return Ok(new ChangePasswordResponse
+        {
+            Token = newTokenResponse.Token,
+            Role = newTokenResponse.Role,
+            AccountState = newTokenResponse.AccountState
+        });
     }
 
     [HttpPost("forgot-password")]

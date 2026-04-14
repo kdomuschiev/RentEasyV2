@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 1-5-login-and-authentication-ui (2026-04-14)
+
+- **Stub pages (dashboard, billing) hardcoded English strings** — Story 2.3 and 3.4 will implement fully; stubs are intentionally minimal.
+- **`RequiresPasswordChangeMiddleware` also whitelists regular `/api/auth/change-password`** — pre-existing behavior from Story 1.4; `RequiresPasswordChange` users could call the regular change-password endpoint if they know their temp password. Low risk since temp passwords are system-generated.
+- **BFF handlers forward raw request body to API without field filtering** — API validates all inputs; extra fields are ignored by the deserializer. Defense-in-depth concern only.
+- **Settings/layout JWT parsing without signature verification** — consistent pattern from Story 1.4 layouts; actual protection is at the API level via `TokenValidFromMiddleware`.
+- **Duplicate password validation in controller and Identity** — intentional: controller check rejects invalid passwords before `RemovePasswordAsync` runs, preventing account corruption in the typical case.
+
 ## Deferred from: code review of 1-4-nextjs-bff-auth-layer-and-i18n-routing (2026-04-12)
 
 - **Language toggle (AC5)** — LanguageToggle UI component not implemented in Story 1.4; routing infrastructure is ready. Implement in Story 1.5 or 1.6 (Design System Foundation).

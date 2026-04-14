@@ -122,7 +122,60 @@ public class AuthService
         return (true, null);
     }
 
-    public async Task<string?> GenerateNewTokenAsync(Guid userId)
+    public async Task<(bool Success, string? Error, LoginResponse? Response)> ForcedChangePasswordAsync(Guid userId, string newPassword)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return (false, "User not found.", null);
+
+        // Pre-validate against Identity's password validators BEFORE removing the existing password.
+        // This prevents leaving the account in a password-less state if validation fails.
+        foreach (var validator in _userManager.PasswordValidators)
+        {
+            var validationResult = await validator.ValidateAsync(_userManager, user, newPassword);
+            if (!validationResult.Succeeded)
+            {
+                var validationErrors = string.Join(" ", validationResult.Errors.Select(e => e.Description));
+                return (false, validationErrors, null);
+            }
+        }
+
+        var removeResult = await _userManager.RemovePasswordAsync(user);
+        if (!removeResult.Succeeded)
+        {
+            var errors = string.Join(" ", removeResult.Errors.Select(e => e.Description));
+            return (false, errors, null);
+        }
+
+        // Set state before AddPasswordAsync — its internal UpdateAsync call persists these together,
+        // avoiding a redundant second DB write. Truncate to Unix-second boundary so iat >= TokenValidFrom
+        // holds for freshly issued tokens.
+        user.TokenValidFrom = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        user.AccountState = AccountState.Active;
+
+        var addResult = await _userManager.AddPasswordAsync(user, newPassword);
+        if (!addResult.Succeeded)
+        {
+            var errors = string.Join(" ", addResult.Errors.Select(e => e.Description));
+            return (false, errors, null);
+        }
+
+        // No separate UpdateAsync needed — AddPasswordAsync's internal UpdateAsync already persisted
+        // TokenValidFrom and AccountState along with the new password hash.
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var role = roles.FirstOrDefault() ?? "Tenant";
+        var token = GenerateJwt(user, role);
+
+        return (true, null, new LoginResponse
+        {
+            Token = token,
+            Role = role,
+            AccountState = user.AccountState.ToString()
+        });
+    }
+
+    public async Task<LoginResponse?> GenerateNewTokenAsync(Guid userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
@@ -131,7 +184,12 @@ public class AuthService
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "Tenant";
 
-        return GenerateJwt(user, role);
+        return new LoginResponse
+        {
+            Token = GenerateJwt(user, role),
+            Role = role,
+            AccountState = user.AccountState.ToString()
+        };
     }
 
     private string GenerateJwt(ApplicationUser user, string role)

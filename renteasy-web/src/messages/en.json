@@ -2,5 +2,38 @@
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "invalidCredentials": "Invalid email or password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "newPassword": "New Password",
+      "currentPassword": "Current Password",
+      "submit": "Change Password",
+      "success": "Password changed successfully",
+      "requirements": "Minimum 8 characters, letters and numbers"
+    },
+    "validation": {
+      "required": "Required field",
+      "invalidEmail": "Invalid email address",
+      "passwordTooShort": "Minimum 8 characters",
+      "passwordComplexity": "Must contain letters and numbers"
+    },
+    "header": {
+      "logout": "Logout",
+      "switchToEn": "EN",
+      "switchToBg": "BG"
+    }
+  },
+  "settings": {
+    "title": "Settings"
   }
 }

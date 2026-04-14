@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { AppHeader } from '@/components/ui/AppHeader'
 
 export default async function LandlordLayout({
   children,
@@ -26,5 +27,10 @@ export default async function LandlordLayout({
     redirect(`/${locale}/login`)
   }
 
-  return <>{children}</>
+  return (
+    <>
+      <AppHeader />
+      <main id="main-content">{children}</main>
+    </>
+  )
 }

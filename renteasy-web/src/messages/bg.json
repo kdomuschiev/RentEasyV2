@@ -2,5 +2,38 @@
   "common": {
     "loading": "Зареждане...",
     "error": "Нещо се обърка"
+  },
+  "auth": {
+    "login": {
+      "title": "Вход",
+      "email": "Имейл",
+      "password": "Парола",
+      "submit": "Вход",
+      "invalidCredentials": "Невалиден имейл или парола",
+      "showPassword": "Покажи парола",
+      "hidePassword": "Скрий парола"
+    },
+    "changePassword": {
+      "title": "Смяна на парола",
+      "newPassword": "Нова парола",
+      "currentPassword": "Текуща парола",
+      "submit": "Смени парола",
+      "success": "Паролата е сменена успешно",
+      "requirements": "Минимум 8 символа, букви и цифри"
+    },
+    "validation": {
+      "required": "Задължително поле",
+      "invalidEmail": "Невалиден имейл адрес",
+      "passwordTooShort": "Минимум 8 символа",
+      "passwordComplexity": "Трябва да съдържа букви и цифри"
+    },
+    "header": {
+      "logout": "Изход",
+      "switchToEn": "EN",
+      "switchToBg": "BG"
+    }
+  },
+  "settings": {
+    "title": "Настройки"
   }
 }
