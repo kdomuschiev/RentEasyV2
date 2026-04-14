@@ -81,7 +81,7 @@ export default function ChangePasswordPage() {
           </div>
 
           {apiError && (
-            <p role="alert" className="text-red-600 text-sm mb-4">
+            <p role="alert" className="text-[--color-error] text-sm mb-4">
               {apiError}
             </p>
           )}
@@ -89,7 +89,7 @@ export default function ChangePasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+            className="w-full bg-[--color-accent] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
           >
             {loading ? tCommon('loading') : t('changePassword.submit')}
           </button>

@@ -18,12 +18,12 @@ export function AppHeader() {
   }
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 border-b">
+    <header className="flex items-center justify-between px-4 py-3 border-b border-[#E5E0D8] bg-[#4A6172]">
       <LanguageToggle />
       <button
         type="button"
         onClick={handleLogout}
-        className="text-sm text-gray-700"
+        className="text-sm text-white min-h-[44px] px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A6172] rounded"
       >
         {t('logout')}
       </button>

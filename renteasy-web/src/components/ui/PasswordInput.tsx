@@ -29,12 +29,12 @@ export function PasswordInput({ id, name, value, onChange, onBlur, placeholder, 
         placeholder={placeholder}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : undefined}
-        className="w-full pr-10 border rounded px-3 py-2"
+        className="w-full pr-10 border border-[#E5E0D8] rounded px-3 py-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
       />
       <button
         type="button"
         onClick={() => setShow(!show)}
-        className="absolute right-3 top-1/2 -translate-y-1/2"
+        className="absolute right-3 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2 rounded"
         aria-label={show ? hidePasswordLabel : showPasswordLabel}
       >
         {show ? (
@@ -50,7 +50,7 @@ export function PasswordInput({ id, name, value, onChange, onBlur, placeholder, 
         )}
       </button>
       {error && (
-        <p id={errorId} className="text-red-600 text-sm mt-1">
+        <p id={errorId} className="text-[--color-error] text-sm mt-1">
           {error}
         </p>
       )}

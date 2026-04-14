@@ -19,14 +19,14 @@ export function LanguageToggle() {
       <button
         onClick={() => switchLocale('bg')}
         aria-pressed={locale === 'bg'}
-        className={locale === 'bg' ? 'font-semibold' : 'text-gray-500'}
+        className={`min-h-[44px] px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A6172] rounded ${locale === 'bg' ? 'font-semibold text-white' : 'text-white/70'}`}
       >
         BG
       </button>
       <button
         onClick={() => switchLocale('en')}
         aria-pressed={locale === 'en'}
-        className={locale === 'en' ? 'font-semibold' : 'text-gray-500'}
+        className={`min-h-[44px] px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A6172] rounded ${locale === 'en' ? 'font-semibold text-white' : 'text-white/70'}`}
       >
         EN
       </button>
