@@ -12,20 +12,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const apiResponse = await fetch(`${apiUrl}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
+  let apiResponse: Response
+  try {
+    apiResponse = await fetch(`${apiUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  } catch {
+    return NextResponse.json({ error: 'Could not reach API' }, { status: 502 })
+  }
 
-  const data = await apiResponse.json()
+  let data: unknown
+  try {
+    data = await apiResponse.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid API response' }, { status: 502 })
+  }
 
   if (!apiResponse.ok) {
     return NextResponse.json(data, { status: apiResponse.status })
   }
 
+  const { token, role, accountState } = data as { token: string; role: string; accountState: string }
+
   const cookieStore = await cookies()
-  cookieStore.set('jwt', data.token, {
+  cookieStore.set('jwt', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
@@ -33,5 +45,5 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     maxAge: 60 * 60 * 24 * 7,
   })
 
-  return NextResponse.json({ role: data.role, accountState: data.accountState })
+  return NextResponse.json({ role, accountState })
 }
