@@ -34,5 +34,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: app-renteasy-v2-api
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
           package: ./publish
