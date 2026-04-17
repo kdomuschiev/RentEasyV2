@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'renteasy-api/**'
+      - 'RentEasy.Api/**'
       - '.github/workflows/api-deploy.yml'
 
 jobs:
@@ -22,13 +22,13 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore renteasy-api/renteasy-api.csproj
+        run: dotnet restore RentEasy.Api/RentEasy.Api.csproj
 
       - name: Build
-        run: dotnet build renteasy-api/renteasy-api.csproj --configuration Release --no-restore
+        run: dotnet build RentEasy.Api/RentEasy.Api.csproj --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish renteasy-api/renteasy-api.csproj --configuration Release --no-build --output ./publish
+        run: dotnet publish RentEasy.Api/RentEasy.Api.csproj --configuration Release --no-build --output ./publish
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3

@@ -48,7 +48,7 @@ RentEasyV2/
 ├── .github/workflows/
 │   ├── api-deploy.yml              ← Azure App Service B1
 │   └── web-deploy.yml              ← Azure Static Web Apps
-├── renteasy-api/                   ← ASP.NET Core 10 Web API
+├── RentEasy.Api/                   ← ASP.NET Core 10 Web API
 │   ├── Controllers/                ← One controller per resource domain
 │   ├── Domain/
 │   │   ├── Entities/               ← EF Core entity classes (PascalCase singular)
@@ -66,7 +66,7 @@ RentEasyV2/
 │       ├── Extensions/
 │       ├── Middleware/             ← TokenValidFromMiddleware, ErrorHandlingMiddleware
 │       └── Constants.cs            ← MaxFileSize, SignedUrlExpiry, NudgeIntervals
-├── renteasy-web/                   ← Next.js 16 frontend
+├── RentEasy.Web/                   ← Next.js 16 frontend
 │   └── src/
 │       ├── app/[locale]/
 │       │   ├── (public)/           ← Showcase page (static, unauthenticated)
