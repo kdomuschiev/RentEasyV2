@@ -23,7 +23,7 @@ export function AppHeader() {
       <button
         type="button"
         onClick={handleLogout}
-        className="text-sm text-white min-h-[44px] px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#4A6172] rounded"
+        className="text-sm text-white min-h-[44px] px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2 rounded"
       >
         {t('logout')}
       </button>

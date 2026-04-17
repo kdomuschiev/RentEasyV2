@@ -56,10 +56,10 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-semibold mb-6">{t('changePassword.title')}</h1>
-        <p className="text-sm text-gray-600 mb-4">{t('changePassword.requirements')}</p>
+        <p className="text-sm text-[--color-muted] mb-4">{t('changePassword.requirements')}</p>
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
             <label htmlFor="newPassword" className="block text-sm font-medium mb-1">

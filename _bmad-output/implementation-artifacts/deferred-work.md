@@ -1,5 +1,19 @@
 # Deferred Work
 
+## Deferred from: code review of 1-6-design-system-foundation (2026-04-14)
+
+- **JWT auth-guard layouts decode payload without signature verification** — pre-existing (Stories 1.3–1.5); actual enforcement is at the API via `TokenValidFromMiddleware`. No change needed unless client-side trust boundary becomes a concern.
+- **LanguageToggle drops query strings and hash fragments on locale switch** — pre-existing (Story 1.5); `segments[1] = newLocale` only replaces the locale path segment. Revisit when query-string–dependent pages exist.
+- **`sameSite: 'strict'` on JWT cookie blocks external-link cross-site navigation** — pre-existing (Story 1.3); `lax` is the OWASP recommendation for auth cookies that must survive top-level navigations. Revisit before email-link flows are introduced.
+- **`autoComplete` attributes missing on PasswordInput** — `PasswordInput` has no `autoComplete` prop in its interface; login/change-password forms cannot signal `current-password` or `new-password` to password managers. Address when `PasswordInput` interface is next extended.
+- **AppHeader: failed logout silently redirects without clearing cookie** — pre-existing (Story 1.5); on network error the JWT cookie is not cleared but the user is redirected to login, where they are immediately bounced back to the dashboard. Add error state UI when AppHeader is further developed.
+- **PasswordChangeForm success flag not cleared at start of re-submit** — pre-existing (Story 1.5); success and apiError can briefly coexist. `setSuccess(false)` should be called at the top of `handleSubmit`.
+- **LoginPage: stale API error not cleared on subsequent client-side validation failure** — pre-existing (Story 1.5); `setErrors({})` is only called when both validators pass, leaving a prior API error visible alongside new field errors.
+- **HTML `<title>` and `<meta description>` not locale-aware** — pre-existing (Story 1.4); static `metadata` export in `[locale]/layout.tsx` always renders English strings. Migrate to `generateMetadata` when SEO/localisation becomes a priority.
+- **`aria-busy` missing on submit buttons during loading state** — not in AC scope; screen readers don't announce that a form is processing. Add `aria-busy={loading}` when accessibility pass is done.
+- **Tenant layout does not guard `ReadOnly` account state** — pre-existing (Story 1.4); a tenant in `ReadOnly` state bypasses any read-only restriction in the layout redirect logic. Address in the move-out flow (Epic 6).
+- **Focus rings use hardcoded hex `#4A6172` instead of CSS variable** — low-severity style concern; `focus-visible:ring-[#4A6172]` is functionally correct but won't update if `--color-primary` changes. Replace with `focus-visible:ring-[--color-primary]` when doing a token-cleanup pass.
+
 ## Deferred from: code review of 1-5-login-and-authentication-ui (2026-04-14)
 
 - **Stub pages (dashboard, billing) hardcoded English strings** — Story 2.3 and 3.4 will implement fully; stubs are intentionally minimal.

@@ -1,6 +1,6 @@
 # Story 1.6: Design System Foundation
 
-Status: review
+Status: done
 
 ## Story
 
@@ -462,6 +462,36 @@ claude-sonnet-4-6
 - `renteasy-web/src/components/ui/separator.tsx` — new shadcn Separator
 - `renteasy-web/src/components/ui/label.tsx` — new shadcn Label (installed as dependency of form)
 - `renteasy-web/package.json` — added class-variance-authority, clsx, tailwind-merge, lucide-react, @radix-ui/* packages
+
+## Review Findings
+
+### Decision Needed
+
+- [x] [Review][Decision] `button.tsx` `sm` size variant — resolved: changed to `min-h-[44px]` to comply with AC7 across all sizes
+- [x] [Review][Decision] `AppHeader`/`LanguageToggle` focus ring `ring-white` — resolved: standardised to `ring-[#4A6172]` per AC5
+
+### Patches
+
+- [x] [Review][Patch] PasswordInput toggle button `min-w-[44px]` overlaps input text area — fixed: `pr-10` → `pr-12` [`PasswordInput.tsx:32`]
+- [x] [Review][Patch] `change-password/page.tsx` uses hardcoded `text-gray-600` — fixed: replaced with `text-[--color-muted]` [`change-password/page.tsx:62`]
+- [x] [Review][Patch] `LanguageToggle` buttons missing `type="button"` — fixed [`LanguageToggle.tsx:20,27`]
+- [x] [Review][Patch] Skip-to-content `#main-content` anchor absent on `(auth)` pages — fixed: added `id="main-content"` to `<main>` in `login/page.tsx` and `change-password/page.tsx`
+- [x] [Review][Patch] shadcn `Input` component height `h-10` (40px) below AC7 minimum — fixed: changed to `min-h-[44px]` [`input.tsx:11`]
+- [x] [Review][Patch] `@theme inline` missing `--color-muted` utility — fixed: added alongside `--color-muted-foreground` [`globals.css:52`]
+
+### Deferred
+
+- [x] [Review][Defer] JWT auth-guard layouts decode payload without signature verification [`(landlord)/layout.tsx`, `(tenant)/layout.tsx`] — deferred, pre-existing (Stories 1.3–1.5; actual enforcement at API via `TokenValidFromMiddleware`)
+- [x] [Review][Defer] LanguageToggle locale switch drops query strings and hash fragments on navigation [`LanguageToggle.tsx:12`] — deferred, pre-existing (Story 1.5)
+- [x] [Review][Defer] `sameSite: 'strict'` on JWT cookie may block external-link cross-site navigation [`login/route.ts:41`] — deferred, pre-existing (Story 1.3)
+- [x] [Review][Defer] `autoComplete` attributes missing on PasswordInput (current-password / new-password) [`PasswordInput.tsx`] — deferred, not in AC scope for Story 1.6
+- [x] [Review][Defer] AppHeader: failed logout silently redirects without clearing cookie [`AppHeader.tsx:11`] — deferred, pre-existing (Story 1.5)
+- [x] [Review][Defer] PasswordChangeForm success flag not cleared at start of re-submit [`PasswordChangeForm.tsx:35`] — deferred, pre-existing (Story 1.5)
+- [x] [Review][Defer] LoginPage: stale API error not cleared on subsequent client-side validation failure [`login/page.tsx:29`] — deferred, pre-existing (Story 1.5)
+- [x] [Review][Defer] HTML `<title>` and `<meta description>` not locale-aware [`layout.tsx:19`] — deferred, pre-existing (Story 1.4)
+- [x] [Review][Defer] `aria-busy` missing on submit buttons during loading state — deferred, not in AC scope
+- [x] [Review][Defer] Tenant layout does not guard `ReadOnly` account state with redirect — deferred, pre-existing (Story 1.4)
+- [x] [Review][Defer] Focus rings use hardcoded hex `#4A6172` instead of CSS variable `var(--color-primary)` — deferred, low-severity style concern; functional behaviour is correct
 
 ## Change Log
 

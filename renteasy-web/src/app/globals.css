@@ -49,6 +49,7 @@
   --color-accent: var(--color-accent);
   --color-oak: var(--color-oak);
   --color-text: var(--color-text);
+  --color-muted: var(--color-muted);
   --color-muted-foreground: var(--color-muted);
   --color-success: var(--color-success);
   --color-pending: var(--color-pending);

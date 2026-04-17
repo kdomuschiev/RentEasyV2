@@ -29,7 +29,7 @@ export function PasswordInput({ id, name, value, onChange, onBlur, placeholder, 
         placeholder={placeholder}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : undefined}
-        className="w-full pr-10 border border-[#E5E0D8] rounded px-3 py-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
+        className="w-full pr-12 border border-[#E5E0D8] rounded px-3 py-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
       />
       <button
         type="button"
