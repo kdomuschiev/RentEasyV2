@@ -101,13 +101,13 @@ export function PasswordChangeForm() {
       </div>
 
       {apiError && (
-        <p role="alert" className="text-[--color-error] text-sm">
+        <p role="alert" className="text-[var(--color-error)] text-sm">
           {apiError}
         </p>
       )}
 
       {success && (
-        <p role="status" className="text-[--color-success] text-sm">
+        <p role="status" className="text-[var(--color-success)] text-sm">
           {t('changePassword.success')}
         </p>
       )}
@@ -115,7 +115,7 @@ export function PasswordChangeForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[--color-accent] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
+        className="w-full bg-[var(--color-accent)] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
       >
         {loading ? tCommon('loading') : t('changePassword.submit')}
       </button>
