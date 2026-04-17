@@ -92,6 +92,23 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             .Property(p => p.SizeSqm)
             .HasPrecision(18, 2);
 
+        var billCategoryJsonOptions = new System.Text.Json.JsonSerializerOptions();
+        billCategoryJsonOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+        builder.Entity<Property>()
+            .Property(p => p.BillCategories)
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, billCategoryJsonOptions),
+                v => System.Text.Json.JsonSerializer.Deserialize<List<BillCategory>>(v, billCategoryJsonOptions) ?? new List<BillCategory>()
+            )
+            .HasColumnType("text")
+            .HasDefaultValueSql("'[]'")
+            .Metadata.SetValueComparer(new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<BillCategory>>(
+                (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()
+            ));
+
         // Max-length for JSON blob path arrays
         builder.Entity<ConditionReportItem>()
             .Property(e => e.PhotoBlobPaths)

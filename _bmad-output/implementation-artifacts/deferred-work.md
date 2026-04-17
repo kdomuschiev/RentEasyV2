@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 2-1-property-and-payment-method-api (2026-04-17)
+
+- **No input validation on IBAN, IrisPayPhoneNumber, RevolutMeLink** — format validation (Bulgarian IBAN, phone regex, URL for Revolut) is beyond Story 2.1 scope. Add `[MaxLength]` + format validators in Story 2.3 when the UI is built and the data shape is confirmed.
+- **HasQueryFilter throws UnauthorizedAccessException as HTTP 500 for unauthenticated calls** — pre-existing issue in `AppDbContext.GetCurrentLandlordId()` from Story 1.2/1.3. The `ErrorHandlingMiddleware` catches this as a generic 500 rather than 401. Pre-existing; address in a dedicated security hardening pass.
+- **UpdatePropertyRequest duplicates CreatePropertyRequest** — intentional for now; kept separate in case update semantics diverge (e.g. Name becomes optional). Unify if they remain identical through Story 2.3.
+- **No GET /api/properties list endpoint** — only `GET /api/properties/{id}` exists; the frontend needs a way to discover property IDs. Will be addressed in Story 2.3 (property setup UI) which will need a list endpoint.
+- **bill_categories text column has no DB-level JSON constraint** — EF Core `HasColumnType("text")` does not generate a CHECK constraint for valid JSON. A direct DB write of non-JSON will cause a deserialization exception at read time. Pre-existing limitation of the EF Core approach.
+
 ## Deferred from: code review of 1-6-design-system-foundation (2026-04-14)
 
 - **JWT auth-guard layouts decode payload without signature verification** — pre-existing (Stories 1.3–1.5); actual enforcement is at the API via `TokenValidFromMiddleware`. No change needed unless client-side trust boundary becomes a concern.
