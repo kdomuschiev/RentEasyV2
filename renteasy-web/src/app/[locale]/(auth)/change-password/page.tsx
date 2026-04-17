@@ -56,10 +56,10 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-semibold mb-6">{t('changePassword.title')}</h1>
-        <p className="text-sm text-gray-600 mb-4">{t('changePassword.requirements')}</p>
+        <p className="text-sm text-[--color-muted] mb-4">{t('changePassword.requirements')}</p>
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
             <label htmlFor="newPassword" className="block text-sm font-medium mb-1">
@@ -81,7 +81,7 @@ export default function ChangePasswordPage() {
           </div>
 
           {apiError && (
-            <p role="alert" className="text-red-600 text-sm mb-4">
+            <p role="alert" className="text-[--color-error] text-sm mb-4">
               {apiError}
             </p>
           )}
@@ -89,7 +89,7 @@ export default function ChangePasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+            className="w-full bg-[--color-accent] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
           >
             {loading ? tCommon('loading') : t('changePassword.submit')}
           </button>

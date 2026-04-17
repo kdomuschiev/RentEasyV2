@@ -62,7 +62,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-semibold mb-6">{t('login.title')}</h1>
         <form onSubmit={handleSubmit} noValidate>
@@ -82,11 +82,11 @@ export default function LoginPage() {
               }}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? 'email-error' : undefined}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-[#E5E0D8] rounded px-3 py-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
               autoComplete="email"
             />
             {errors.email && (
-              <p id="email-error" className="text-red-600 text-sm mt-1">
+              <p id="email-error" className="text-[--color-error] text-sm mt-1">
                 {errors.email}
               </p>
             )}
@@ -112,7 +112,7 @@ export default function LoginPage() {
           </div>
 
           {errors.api && (
-            <p role="alert" className="text-red-600 text-sm mb-4">
+            <p role="alert" className="text-[--color-error] text-sm mb-4">
               {errors.api}
             </p>
           )}
@@ -120,7 +120,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+            className="w-full bg-[--color-accent] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
           >
             {loading ? tCommon('loading') : t('login.submit')}
           </button>

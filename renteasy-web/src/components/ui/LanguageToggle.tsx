@@ -17,16 +17,18 @@ export function LanguageToggle() {
   return (
     <div className="flex gap-2" role="group" aria-label="Language">
       <button
+        type="button"
         onClick={() => switchLocale('bg')}
         aria-pressed={locale === 'bg'}
-        className={locale === 'bg' ? 'font-semibold' : 'text-gray-500'}
+        className={`min-h-[44px] px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2 rounded ${locale === 'bg' ? 'font-semibold text-white' : 'text-white/70'}`}
       >
         BG
       </button>
       <button
+        type="button"
         onClick={() => switchLocale('en')}
         aria-pressed={locale === 'en'}
-        className={locale === 'en' ? 'font-semibold' : 'text-gray-500'}
+        className={`min-h-[44px] px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2 rounded ${locale === 'en' ? 'font-semibold text-white' : 'text-white/70'}`}
       >
         EN
       </button>

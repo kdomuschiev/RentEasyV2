@@ -35,5 +35,8 @@
   },
   "settings": {
     "title": "Settings"
+  },
+  "a11y": {
+    "skipToContent": "Skip to content"
   }
 }
