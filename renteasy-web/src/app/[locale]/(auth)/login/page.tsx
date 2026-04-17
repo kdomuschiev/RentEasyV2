@@ -86,7 +86,7 @@ export default function LoginPage() {
               autoComplete="email"
             />
             {errors.email && (
-              <p id="email-error" className="text-[--color-error] text-sm mt-1">
+              <p id="email-error" className="text-[var(--color-error)] text-sm mt-1">
                 {errors.email}
               </p>
             )}
@@ -112,7 +112,7 @@ export default function LoginPage() {
           </div>
 
           {errors.api && (
-            <p role="alert" className="text-[--color-error] text-sm mb-4">
+            <p role="alert" className="text-[var(--color-error)] text-sm mb-4">
               {errors.api}
             </p>
           )}
@@ -120,7 +120,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[--color-accent] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
+            className="w-full bg-[var(--color-accent)] text-white rounded px-4 py-2 min-h-[44px] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A6172] focus-visible:ring-offset-2"
           >
             {loading ? tCommon('loading') : t('login.submit')}
           </button>

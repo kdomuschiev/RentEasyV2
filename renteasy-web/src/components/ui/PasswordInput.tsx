@@ -50,7 +50,7 @@ export function PasswordInput({ id, name, value, onChange, onBlur, placeholder, 
         )}
       </button>
       {error && (
-        <p id={errorId} className="text-[--color-error] text-sm mt-1">
+        <p id={errorId} className="text-[var(--color-error)] text-sm mt-1">
           {error}
         </p>
       )}
