@@ -8,7 +8,7 @@ namespace renteasy_api.Controllers;
 
 [ApiController]
 [Route("api/properties")]
-[Authorize(Roles = "Landlord")]
+[Authorize]
 public class PropertiesController : ControllerBase
 {
     private readonly PropertyService _propertyService;
@@ -18,10 +18,27 @@ public class PropertiesController : ControllerBase
         _propertyService = propertyService;
     }
 
+    private IActionResult? TryGetLandlordId(out Guid landlordId)
+    {
+        var claim = User.FindFirstValue("landlord_id");
+        if (!Guid.TryParse(claim, out landlordId))
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Unauthorized",
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = "Missing or invalid landlord identity claim."
+            });
+        }
+        return null;
+    }
+
     [HttpPost]
+    [Authorize(Roles = "Landlord")]
     public async Task<IActionResult> Create([FromBody] CreatePropertyRequest request)
     {
-        if (!request.BillCategories.Any())
+        if (request.BillCategories == null || !request.BillCategories.Any())
         {
             return BadRequest(new ProblemDetails
             {
@@ -32,7 +49,9 @@ public class PropertiesController : ControllerBase
             });
         }
 
-        var landlordId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var authError = TryGetLandlordId(out var landlordId);
+        if (authError != null) return authError;
+
         var dto = await _propertyService.CreatePropertyAsync(landlordId, request);
         return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
     }
@@ -40,7 +59,10 @@ public class PropertiesController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
-        var dto = await _propertyService.GetPropertyAsync(id);
+        var authError = TryGetLandlordId(out var landlordId);
+        if (authError != null) return authError;
+
+        var dto = await _propertyService.GetPropertyAsync(landlordId, id);
         if (dto == null)
         {
             return NotFound(new ProblemDetails
@@ -56,9 +78,10 @@ public class PropertiesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Landlord")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePropertyRequest request)
     {
-        if (!request.BillCategories.Any())
+        if (request.BillCategories == null || !request.BillCategories.Any())
         {
             return BadRequest(new ProblemDetails
             {
@@ -69,7 +92,10 @@ public class PropertiesController : ControllerBase
             });
         }
 
-        var dto = await _propertyService.UpdatePropertyAsync(id, request);
+        var authError = TryGetLandlordId(out var landlordId);
+        if (authError != null) return authError;
+
+        var dto = await _propertyService.UpdatePropertyAsync(landlordId, id, request);
         if (dto == null)
         {
             return NotFound(new ProblemDetails
@@ -85,9 +111,13 @@ public class PropertiesController : ControllerBase
     }
 
     [HttpPut("{id:guid}/payment-methods")]
+    [Authorize(Roles = "Landlord")]
     public async Task<IActionResult> UpdatePaymentMethods(Guid id, [FromBody] UpdatePaymentMethodsRequest request)
     {
-        var dto = await _propertyService.UpdatePaymentMethodsAsync(id, request);
+        var authError = TryGetLandlordId(out var landlordId);
+        if (authError != null) return authError;
+
+        var dto = await _propertyService.UpdatePaymentMethodsAsync(landlordId, id, request);
         if (dto == null)
         {
             return NotFound(new ProblemDetails

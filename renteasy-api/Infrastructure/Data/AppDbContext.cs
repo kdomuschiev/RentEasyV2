@@ -92,11 +92,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             .Property(p => p.SizeSqm)
             .HasPrecision(18, 2);
 
+        var billCategoryJsonOptions = new System.Text.Json.JsonSerializerOptions();
+        billCategoryJsonOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
         builder.Entity<Property>()
             .Property(p => p.BillCategories)
             .HasConversion(
-                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
-                v => System.Text.Json.JsonSerializer.Deserialize<List<BillCategory>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<BillCategory>()
+                v => System.Text.Json.JsonSerializer.Serialize(v, billCategoryJsonOptions),
+                v => System.Text.Json.JsonSerializer.Deserialize<List<BillCategory>>(v, billCategoryJsonOptions) ?? new List<BillCategory>()
             )
             .HasColumnType("text")
             .HasDefaultValueSql("'[]'")

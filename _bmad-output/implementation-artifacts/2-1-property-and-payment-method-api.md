@@ -1,6 +1,6 @@
 # Story 2.1: Property & Payment Method API
 
-Status: review
+Status: done
 
 ## Story
 
@@ -282,6 +282,9 @@ New files to create:
 - `HasDefaultValueSql("'[]'")` used instead of `HasDefaultValue` to avoid EF design-time type conflict
 - 5 new `PropertyServiceTests`: create, get-own, get-cross-tenant (returns null), update, payment methods set+clear
 - All 34 tests pass (29 pre-existing + 5 new), build clean, 0 warnings
+- Code review patches applied: JsonStringEnumConverter for BillCategories, explicit per-resource ownership predicates, TryParse + 401 guard via TryGetLandlordId helper, BillCategories dedup (.Distinct()), null guard on BillCategories list, MaxLength on Name/Address, Range on SizeSqm/Floor, 3 new cross-tenant tests, before/after timestamp bracketing replacing Task.Delay
+- Tenant GET allowed: class-level [Authorize], [Authorize(Roles="Landlord")] on POST/PUT individually
+- 37 tests pass after review patches (37 total)
 
 ## File List
 
@@ -306,3 +309,24 @@ New files to create:
 ## Change Log
 
 - 2026-04-17: Story 2.1 implemented — Property & Payment Method API. Added 4 endpoints, Property entity extensions, EF migration (applied to Neon), DTOs, PropertyService, PropertiesController, 5 new tests. All 34 tests pass.
+- 2026-04-17: Code review complete — all 10 patches applied, 1 design decision resolved (tenant GET allowed via class-level [Authorize]), 5 items deferred. 37 tests pass, build clean.
+
+### Review Findings
+
+- [x] [Review][Decision] Tenant role blocked from GET /api/properties/{id} — class-level [Authorize(Roles = "Landlord")] prevents tenants reading payment methods; AC7 only restricts POST/PUT — **Resolved (option 1): changed to [Authorize] at class level, [Authorize(Roles="Landlord")] on POST/PUT individually**
+
+- [x] [Review][Patch] BillCategories serialised as integers not strings in DB — no JsonStringEnumConverter [AppDbContext.cs]
+- [x] [Review][Patch] No explicit per-resource ownership check in service methods — GET/PUT/UpdatePaymentMethods rely solely on HasQueryFilter [PropertyService.cs]
+- [x] [Review][Patch] `Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)` crashes with NullReferenceException if claim absent — use TryParse + 401 guard [PropertiesController.cs:35]
+- [x] [Review][Patch] BillCategories accepts duplicate enum values — no deduplication in service before assignment [PropertyService.cs]
+- [x] [Review][Patch] BillCategories field on request DTOs has no null guard — `null` from client causes NullReferenceException in controller `.Any()` check [PropertiesController.cs]
+- [x] [Review][Patch] No MaxLength constraint on Name and Address — unbounded strings reach database [CreatePropertyRequest.cs, UpdatePropertyRequest.cs]
+- [x] [Review][Patch] SizeSqm and Floor accept negative values — no Range validation [CreatePropertyRequest.cs, UpdatePropertyRequest.cs]
+- [x] [Review][Patch] Missing cross-tenant isolation tests for UpdatePropertyAsync and UpdatePaymentMethodsAsync [PropertyServiceTests.cs]
+- [x] [Review][Patch] Task.Delay(10) in UpdatePropertyAsync test is a timing hazard on slow CI [PropertyServiceTests.cs:133]
+
+- [x] [Review][Defer] No input validation on IBAN, IrisPayPhoneNumber, RevolutMeLink format — deferred, beyond Story 2.1 spec scope
+- [x] [Review][Defer] HasQueryFilter throws UnauthorizedAccessException as HTTP 500 for unauthenticated calls — deferred, pre-existing issue from Story 1.2
+- [x] [Review][Defer] UpdatePropertyRequest duplicates CreatePropertyRequest — deferred, intentional for now; can unify if they diverge
+- [x] [Review][Defer] No GET /api/properties list endpoint — deferred, will be addressed in Story 2.3 (property setup UI)
+- [x] [Review][Defer] bill_categories text column has no DB-level JSON constraint — deferred, pre-existing limitation of EF Core HasColumnType("text")

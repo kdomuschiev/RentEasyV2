@@ -24,7 +24,7 @@ public class PropertyService
             Address = request.Address,
             SizeSqm = request.SizeSqm,
             Floor = request.Floor,
-            BillCategories = request.BillCategories,
+            BillCategories = request.BillCategories.Distinct().ToList(),
             CreatedAt = now,
             UpdatedAt = now,
         };
@@ -35,15 +35,15 @@ public class PropertyService
         return ToDto(property);
     }
 
-    public async Task<PropertyDto?> GetPropertyAsync(Guid id)
+    public async Task<PropertyDto?> GetPropertyAsync(Guid landlordId, Guid id)
     {
-        var property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id);
+        var property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id && p.LandlordId == landlordId);
         return property == null ? null : ToDto(property);
     }
 
-    public async Task<PropertyDto?> UpdatePropertyAsync(Guid id, UpdatePropertyRequest request)
+    public async Task<PropertyDto?> UpdatePropertyAsync(Guid landlordId, Guid id, UpdatePropertyRequest request)
     {
-        var property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id);
+        var property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id && p.LandlordId == landlordId);
         if (property == null)
             return null;
 
@@ -51,16 +51,16 @@ public class PropertyService
         property.Address = request.Address;
         property.SizeSqm = request.SizeSqm;
         property.Floor = request.Floor;
-        property.BillCategories = request.BillCategories;
+        property.BillCategories = request.BillCategories.Distinct().ToList();
         property.UpdatedAt = DateTimeOffset.UtcNow;
 
         await _db.SaveChangesAsync();
         return ToDto(property);
     }
 
-    public async Task<PropertyDto?> UpdatePaymentMethodsAsync(Guid id, UpdatePaymentMethodsRequest request)
+    public async Task<PropertyDto?> UpdatePaymentMethodsAsync(Guid landlordId, Guid id, UpdatePaymentMethodsRequest request)
     {
-        var property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id);
+        var property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id && p.LandlordId == landlordId);
         if (property == null)
             return null;
 

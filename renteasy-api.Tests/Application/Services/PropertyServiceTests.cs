@@ -83,7 +83,7 @@ public class PropertyServiceTests
             BillCategories = [BillCategory.Rent]
         });
 
-        var dto = await service.GetPropertyAsync(created.Id);
+        var dto = await service.GetPropertyAsync(landlordId, created.Id);
 
         Assert.NotNull(dto);
         Assert.Equal(created.Id, dto.Id);
@@ -97,7 +97,6 @@ public class PropertyServiceTests
         var landlordA = Guid.NewGuid();
         var landlordB = Guid.NewGuid();
 
-        // Landlord A creates a property
         var dbA = CreateDbContext(dbName, landlordA);
         var serviceA = CreateService(dbA);
         var created = await serviceA.CreatePropertyAsync(landlordA, new CreatePropertyRequest
@@ -107,10 +106,9 @@ public class PropertyServiceTests
             BillCategories = [BillCategory.Rent]
         });
 
-        // Landlord B tries to access it — HasQueryFilter excludes it → returns null
         var dbB = CreateDbContext(dbName, landlordB);
         var serviceB = CreateService(dbB);
-        var result = await serviceB.GetPropertyAsync(created.Id);
+        var result = await serviceB.GetPropertyAsync(landlordB, created.Id);
 
         Assert.Null(result);
     }
@@ -130,9 +128,8 @@ public class PropertyServiceTests
             BillCategories = [BillCategory.Rent]
         });
 
-        await Task.Delay(10); // ensure UpdatedAt changes
-
-        var updated = await service.UpdatePropertyAsync(created.Id, new UpdatePropertyRequest
+        var before = DateTimeOffset.UtcNow;
+        var updated = await service.UpdatePropertyAsync(landlordId, created.Id, new UpdatePropertyRequest
         {
             Name = "New Name",
             Address = "New Address",
@@ -140,6 +137,7 @@ public class PropertyServiceTests
             Floor = 5,
             BillCategories = [BillCategory.Electricity, BillCategory.Water]
         });
+        var after = DateTimeOffset.UtcNow;
 
         Assert.NotNull(updated);
         Assert.Equal("New Name", updated.Name);
@@ -148,21 +146,49 @@ public class PropertyServiceTests
         Assert.Equal(5, updated.Floor);
         Assert.Contains("Electricity", updated.BillCategories);
         Assert.Contains("Water", updated.BillCategories);
-        Assert.True(updated.UpdatedAt >= created.UpdatedAt);
+        Assert.True(updated.UpdatedAt >= before && updated.UpdatedAt <= after);
     }
 
     [Fact]
-    public async Task UpdatePropertyAsync_ReturnsNull_ForCrossTenantOrNonExistentProperty()
+    public async Task UpdatePropertyAsync_ReturnsNull_ForNonExistentProperty()
     {
         var dbName = Guid.NewGuid().ToString();
         var landlordId = Guid.NewGuid();
         var db = CreateDbContext(dbName, landlordId);
         var service = CreateService(db);
 
-        var result = await service.UpdatePropertyAsync(Guid.NewGuid(), new UpdatePropertyRequest
+        var result = await service.UpdatePropertyAsync(landlordId, Guid.NewGuid(), new UpdatePropertyRequest
         {
             Name = "Attempt",
             Address = "Attempt",
+            BillCategories = [BillCategory.Rent]
+        });
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdatePropertyAsync_ReturnsNull_ForDifferentLandlord()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var landlordA = Guid.NewGuid();
+        var landlordB = Guid.NewGuid();
+
+        var dbA = CreateDbContext(dbName, landlordA);
+        var serviceA = CreateService(dbA);
+        var created = await serviceA.CreatePropertyAsync(landlordA, new CreatePropertyRequest
+        {
+            Name = "A Property",
+            Address = "A Street",
+            BillCategories = [BillCategory.Rent]
+        });
+
+        var dbB = CreateDbContext(dbName, landlordB);
+        var serviceB = CreateService(dbB);
+        var result = await serviceB.UpdatePropertyAsync(landlordB, created.Id, new UpdatePropertyRequest
+        {
+            Name = "Hijack",
+            Address = "Hijack St",
             BillCategories = [BillCategory.Rent]
         });
 
@@ -184,8 +210,7 @@ public class PropertyServiceTests
             BillCategories = [BillCategory.Rent]
         });
 
-        // Set payment methods
-        var withMethods = await service.UpdatePaymentMethodsAsync(created.Id, new UpdatePaymentMethodsRequest
+        var withMethods = await service.UpdatePaymentMethodsAsync(landlordId, created.Id, new UpdatePaymentMethodsRequest
         {
             Iban = "BG80BNBG96611020345678",
             IrisPayPhoneNumber = "+359888123456",
@@ -198,7 +223,7 @@ public class PropertyServiceTests
         Assert.Equal("https://revolut.me/kiril", withMethods.RevolutMeLink);
 
         // Clear IBAN — null clears it
-        var cleared = await service.UpdatePaymentMethodsAsync(created.Id, new UpdatePaymentMethodsRequest
+        var cleared = await service.UpdatePaymentMethodsAsync(landlordId, created.Id, new UpdatePaymentMethodsRequest
         {
             Iban = null,
             IrisPayPhoneNumber = "+359888123456",
@@ -208,5 +233,51 @@ public class PropertyServiceTests
         Assert.NotNull(cleared);
         Assert.Null(cleared.Iban);
         Assert.Equal("+359888123456", cleared.IrisPayPhoneNumber);
+    }
+
+    [Fact]
+    public async Task UpdatePaymentMethodsAsync_ReturnsNull_ForDifferentLandlord()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var landlordA = Guid.NewGuid();
+        var landlordB = Guid.NewGuid();
+
+        var dbA = CreateDbContext(dbName, landlordA);
+        var serviceA = CreateService(dbA);
+        var created = await serviceA.CreatePropertyAsync(landlordA, new CreatePropertyRequest
+        {
+            Name = "A Property",
+            Address = "A Street",
+            BillCategories = [BillCategory.Rent]
+        });
+
+        var dbB = CreateDbContext(dbName, landlordB);
+        var serviceB = CreateService(dbB);
+        var result = await serviceB.UpdatePaymentMethodsAsync(landlordB, created.Id, new UpdatePaymentMethodsRequest
+        {
+            Iban = "BG00FAKE00000000000000"
+        });
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreatePropertyAsync_DeduplicatesBillCategories()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var landlordId = Guid.NewGuid();
+        var db = CreateDbContext(dbName, landlordId);
+        var service = CreateService(db);
+
+        var dto = await service.CreatePropertyAsync(landlordId, new CreatePropertyRequest
+        {
+            Name = "Flat",
+            Address = "Flat St",
+            BillCategories = [BillCategory.Rent, BillCategory.Rent, BillCategory.Electricity]
+        });
+
+        Assert.Equal(2, dto.BillCategories.Count);
+        Assert.Contains("Rent", dto.BillCategories);
+        Assert.Contains("Electricity", dto.BillCategories);
     }
 }
