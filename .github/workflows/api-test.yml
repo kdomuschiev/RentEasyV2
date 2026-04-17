@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'renteasy-api/**'
-      - 'renteasy-api.Tests/**'
+      - 'RentEasy.Api/**'
+      - 'RentEasy.Api.Tests/**'
       - '.github/workflows/api-test.yml'
   pull_request:
     paths:
-      - 'renteasy-api/**'
-      - 'renteasy-api.Tests/**'
+      - 'RentEasy.Api/**'
+      - 'RentEasy.Api.Tests/**'
       - '.github/workflows/api-test.yml'
 
 jobs:
@@ -28,10 +28,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore renteasy-api.Tests/renteasy-api.Tests.csproj
+        run: dotnet restore RentEasy.Api.Tests/RentEasy.Api.Tests.csproj
 
       - name: Build
-        run: dotnet build renteasy-api.Tests/renteasy-api.Tests.csproj --configuration Release --no-restore
+        run: dotnet build RentEasy.Api.Tests/RentEasy.Api.Tests.csproj --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test renteasy-api.Tests/renteasy-api.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test RentEasy.Api.Tests/RentEasy.Api.Tests.csproj --configuration Release --no-build --verbosity normal
